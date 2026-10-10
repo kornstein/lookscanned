@@ -1,0 +1,28 @@
+[package]
+name = "mimeo"
+version = "0.1.0"
+compiler = "0.15.0"
+entrypoint = "lib.typ"
+authors = [
+    "kornstein <https://github.com/kornstein>", 
+    "instelce <https://github.com/instelce>"
+]
+license = "Apache 2.0"
+description = ""
+keywords = [
+    "stylized", 
+    "old-paper"
+]
+repository = "https://github.com/kornstein/mimeo"
+categories = [
+    "visualization", 
+    "layout", 
+    "text", 
+    "fun"]
+disciplines = [
+    "education",
+    "computer-science",
+    "mathematics",
+    "literature"
+]
+exclude = ["/docs"]
