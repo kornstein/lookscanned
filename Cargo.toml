@@ -1,0 +1,21 @@
+[package]
+name = "lookscanned"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Typst plugin generating seeded scan textures (paper, grain, stains, dust, edges)."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[dependencies]
+wasm-minimal-protocol = "0.2"
+minicbor = { version = "2.3", features = ["alloc", "half"] }
+miniz_oxide = "0.9"

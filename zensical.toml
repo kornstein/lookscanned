@@ -1,0 +1,108 @@
+[project]
+site_name = "lookscanned"
+site_url = "https://kornstein.github.io/lookscanned/"
+site_description = "Make Typst documents look scanned, photocopied, faxed or typewritten."
+site_author = "Célestin Besson"
+copyright = "Apache-2.0 licensed"
+repo_url = "https://github.com/kornstein/lookscanned"
+repo_name = "kornstein/lookscanned"
+edit_uri = "edit/master/docs/"
+
+nav = [
+  { "Home" = "index.md" },
+  { "Tutorial" = ["tutorial/first-scanned-document.md"] },
+  { "How-to guides" = [
+    "how-to/choose-a-preset.md",
+    "how-to/tune-the-ink.md",
+    "how-to/age-the-paper.md",
+    "how-to/damage-one-page.md",
+    "how-to/scan-a-region.md",
+    "how-to/stamps-and-notes.md",
+    "how-to/custom-presets.md",
+    "how-to/control-pdf-size.md",
+    "how-to/raw-textures.md",
+  ] },
+  { "Reference" = [
+    "reference/api.md",
+    "reference/themes.md",
+    "reference/presets.md",
+    "reference/textures.md",
+  ] },
+  { "Explanation" = [
+    "explanation/how-it-works.md",
+    "explanation/limitations.md",
+    "explanation/responsible-use.md",
+  ] },
+  { "Contributing" = ["contributing/development.md"] },
+]
+
+[project.theme]
+language = "en"
+features = [
+  "content.action.edit",
+  "content.action.view",
+  "content.code.copy",
+  "content.code.select",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.instant.prefetch",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+  "toc.follow",
+]
+
+[project.theme.icon]
+logo = "lucide/scan-text"
+repo = "fontawesome/brands/github"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "brown"
+accent = "deep orange"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "brown"
+accent = "deep orange"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+toc.permalink = true
+pymdownx.betterem = {}
+pymdownx.details = {}
+pymdownx.emoji.emoji_generator = "zensical.extensions.emoji.to_svg"
+pymdownx.emoji.emoji_index = "zensical.extensions.emoji.twemoji"
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.line_spans = "__span"
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.magiclink = {}
+pymdownx.smartsymbols = {}
+pymdownx.superfences = {}
+pymdownx.tabbed.alternate_style = true
+pymdownx.tabbed.combine_header_slug = true
+pymdownx.tasklist.custom_checkbox = true
