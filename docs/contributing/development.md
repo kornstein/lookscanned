@@ -77,6 +77,6 @@ Figures come from `examples/docs/figures.typ`, one per `--input fig=<name>`. The
 
 ### Deployment
 
-`.github/workflows/docs.yml` builds the plugin, the figures and the site on every push and pull request, and deploys to GitHub Pages on pushes to `main` or `master`.
+`.github/workflows/docs.yml` builds the plugin, the figures and the site on every push and pull request, and deploys to GitHub Pages on pushes to `main`.
 
 One-time setup on GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
