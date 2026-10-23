@@ -44,7 +44,10 @@ Applies the effects to everything that follows. It:
 
 - sets the page `background` (paper, grain, stains) and `foreground` (scanner lines and bands, dust, lighting, punch holes), replacing any you set before;
 - rotates and moves paragraphs, headings, lists, enumerations, term lists, figures, block equations and code blocks so that each page looks rotated;
-- applies ink effects, and word or character jitter, to every text run.
+- applies ink effects, and word or character jitter, to every text run;
+- applies ink effects to every equation as a whole (see [Mathematics](../guide/mathematics.md#equations)).
+
+Place it after your `set page` rules, and before a template rule that must come last.
 
 ## `page`
 
@@ -60,7 +63,7 @@ Overrides the page-level effects for every page that `body` spans: paper, stains
 #lookscanned.region(..arguments)[body]
 ```
 
-Returns a full-width block filled with the paper colour and grain, slightly rotated, whose text gets the ink and jitter effects. It needs no `scan`. Avoid it inside a `scan` document: text effects would apply twice.
+Returns a full-width block filled with the paper colour and grain, slightly rotated, whose text and equations get the ink and jitter effects. It needs no `scan`. Avoid it inside a `scan` document: text effects would apply twice.
 
 ## `stamp`
 

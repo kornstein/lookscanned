@@ -1,40 +1,55 @@
 # lookscanned
 
-Make a Typst document look scanned, photocopied, faxed or typed on a typewriter: paper grain, stains, dust, bleeding ink, slightly rotated pages. Textures and randomness come from a small WASM plugin. Typst applies the effects, so the text stays selectable and the layout stays the same.
+Make a Typst document look scanned, photocopied, faxed or typewritten: paper grain, foxing, stains, dust, scanner
+shadows, drum bands, fax lines and bleeding ink. Textures and randomness come from a small WebAssembly plugin; the
+effects are applied by Typst, so:
+
+- text and equations stay **real text**: selectable, searchable, accessible;
+- the **layout does not move**: line and page breaks are those of the clean document;
+- rendering is **deterministic**: the same `seed` always gives the same PDF.
+
+![A textbook excerpt with the old-paper preset and a photocopied problem sheet](https://raw.githubusercontent.com/kornstein/lookscanned/main/assets/hero.png)
+
+## Quick start
 
 ```typst
 #import "@preview/lookscanned:0.1.0"
 
-#show: lookscanned.scan.with(preset: "office-scan")
+#show: lookscanned.scan.with(preset: "old-paper", seed: 3)
 
-= Rental agreement
-The undersigned have agreed as follows…
+= Cauchy sequences
+A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
+exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
 ```
 
-Rendering is deterministic: the same `seed` always gives the same result.
+Place `scan` after your `set page` rules. With a template whose rule must come last, such as `mousse-notes`, place
+`scan` just before it:
+
+```typst
+#show: lookscanned.scan.with(preset: "old-paper", edges: (binding: true))
+#show: style
+```
 
 ## Presets
 
+![The seven presets on the same excerpt](https://raw.githubusercontent.com/kornstein/lookscanned/main/assets/presets.png)
+
 | Preset | Look |
 |---|---|
-| `"clean-scan"` | Very slight rotation, little grain, off-white paper |
-| `"office-scan"` (default) | Moderate grain, edge shadows, slight drift |
-| `"photocopy"` | High contrast, bands, dust, scratches, heavy bleed |
-| `"fax"` | Transmission lines, irregular words, very degraded |
+| `"clean-scan"` | Off-white paper, little grain, minimal rotation |
+| `"office-scan"` (default) | Moderate grain, edge shadow, slight drift between pages |
+| `"photocopy"` | Heavy bleed, drum bands, dust, scratches |
+| `"fax"` | Transmission lines, per-word jitter, low legibility |
 | `"typewriter"` | Per-character jitter, uneven inking, worn ribbon |
 | `"old-paper"` | Yellowing, foxing, stains, vignette |
-| `"phone-scan"` | Skew and uneven lighting (no true perspective) |
+| `"phone-scan"` | Strong rotation, uneven lighting |
 
-`lookscanned.presets` is a plain dictionary. You can read it, extend it, or pass your own dictionary as `preset`:
+`lookscanned.presets` is a plain dictionary; any dictionary of the same shape can be passed as `preset`.
 
-```typst
-#let mine = lookscanned.presets.fax + (paper: (color: rgb("#eef4ff"), grain: 0.2))
-#show: lookscanned.scan.with(preset: mine)
-```
+## Settings
 
-## Fine tuning
-
-`intensity` multiplies every effect: 0 means none, 1 is the preset as is, and values above 1 exaggerate it. Each theme is a dictionary. Any key you leave out keeps the preset's value.
+`intensity` scales every amount, angle and offset (`0` disables the effect, `1` is the preset, `> 1` exaggerates).
+`seed` selects the variant. Every other setting belongs to a theme; omitted keys keep the preset's value:
 
 ```typst
 #show: lookscanned.scan.with(
@@ -53,48 +68,43 @@ Rendering is deterministic: the same `seed` always gives the same result.
 
 | Key | Effect |
 |---|---|
-| `paper.grain`, `aging`, `fibers` | Grain and mottling, yellowing and foxing, paper fibres |
-| `stains.amount`, `size`, `color` | Stains: blotches, coffee rings, splatters |
-| `stains.dust`, `scratches` | Dust and hairs, long scratches on the scanner glass |
-| `ink.bleed` | Ink spreading into the paper: each glyph grows unevenly, with blotchy edges |
-| `ink.fade` | Uneven inking per word (per character with `"char"`): lighter, towards the paper colour |
-| `ink.legibility` | 1 is sharp, 0 is barely readable (soft halo, more dropouts, fading) |
-| `ink.wear` | Pinholes and dropouts inside the glyphs (worn ribbon, dry toner) |
-| `ink.ghosting` | Faint offset copies of the text. Off by default: some text extractors read the copies too |
-| `skew.page-rotation` | Maximum rotation per page, drawn from the seed |
-| `skew.drift` | 0 means each page is independent; 1 means the angle wanders slowly from page to page |
-| `skew.line-jitter` | Rotation per block (`"line"`) or per word (`"word"`) |
-| `skew.char-jitter` | Offset per word, or baseline shift per character (`"char"`) |
-| `edges.*` | Scanner edge shadow, vignette, uneven light, binding shadow, two punch holes |
+| `paper.grain`, `aging`, `fibers` | Grain and mottling; yellowing and foxing; paper fibres |
+| `stains.amount`, `size`, `color` | Blotches, coffee rings and splatters |
+| `stains.dust`, `scratches` | Specks and hairs, long scratches on the scanner glass |
+| `ink.bleed` | Ink spreading into the paper: glyphs grow unevenly |
+| `ink.fade` | Uneven inking per word (per character with `"char"`) |
+| `ink.legibility` | `1` sharp to `0` barely readable: halo, dropouts, fading |
+| `ink.wear` | Pinholes and dropouts inside the glyphs |
+| `ink.ghosting` | Faint offset copies. Off by default: text extractors read them |
+| `skew.page-rotation`, `drift` | Maximum rotation per page; `1` makes it wander slowly across pages |
+| `skew.line-jitter`, `char-jitter` | Rotation per block or word; offset per word or character |
+| `edges.*` | Edge shadow, vignette, uneven light, binding shadow, two ISO 838 punch holes |
 | `scanner.lines`, `bands` | Fax lines, photocopier bands |
-| `quality.resolution` | DPI of the generated textures (affects PDF size) |
-| `quality.tile` | Reuse one grain tile on every page (smaller PDF) |
-| `quality.granularity` | `"page"`, `"line"`, `"word"` or `"char"` jitter (char is the slowest) |
+| `quality.resolution`, `tile` | Texture DPI; one shared grain tile for all pages |
+| `quality.granularity` | `"page"`, `"line"`, `"word"` or `"char"` jitter |
 
-## Per page, per region
+Unknown themes or keys and values of the wrong type stop compilation with an explicit error.
+
+## Pages, regions and decorations
 
 ```typst
+// Page-level effects for the pages spanned by the body.
 #lookscanned.page(stains: (amount: 0.8), skew: (page-rotation: 2deg))[
-  This page is particularly damaged.
+  = Appendix: tables
 ]
 
-#lookscanned.region(preset: "fax")[
-  This appendix looks like it came in by fax.
+// Text effects on a single block, without the global rule.
+#lookscanned.region(preset: "typewriter")[
+  *Proof.* Let $epsilon > 0$ …
 ]
+
+#lookscanned.stamp("Library copy", color: rgb("#5b3a8c"), angle: -12deg)
+#lookscanned.scribble(body: "see Thm 1.4", color: blue)  // wobbly italic
+#lookscanned.scribble(width: 3cm)                       // scrawl
+#lookscanned.stain(at: (x: 60%, y: 20%), size: 25mm)
 ```
 
-`page` changes the page-level effects (paper, stains, edges, scanner, page rotation) of the pages its body covers. Text effects stay the ones set by `scan`. `region` applies text effects to a block on a paper background, and it works without `scan`.
-
-## Decorations
-
-```typst
-#lookscanned.stamp("Received", color: rgb("#c0392b"), angle: -12deg)
-#lookscanned.scribble(body: "Seen, OK", color: blue)   // wobbly italic
-#lookscanned.scribble(color: blue, width: 4cm)          // scrawl
-#lookscanned.stain(at: (x: 60%, y: 20%), color: rgb("#6b4423"), size: 25mm)
-```
-
-`stamp` and `scribble` also accept `at: (x: .., y: ..)` to place them absolutely.
+`stamp` and `scribble` also accept `at: (x: .., y: ..)` for absolute placement.
 
 ## Raw textures
 
@@ -103,24 +113,29 @@ Rendering is deterministic: the same `seed` always gives the same result.
 #set page(foreground: lookscanned.texture("dust", seed: 3, amount: 0.4))
 ```
 
-The available kinds are `"paper"`, `"grain"`, `"toner"`, `"ink"`, `"stains"`, `"dust"`, `"lines"` and `"edges"`. Without `width` and `height`, a texture takes the size of the page.
-
-## How the ink works
-
-The glyphs are never rasterised. Their paint is replaced instead: the fill becomes a tiling of mottled ink with pinholes, and the outline becomes a stroke painted with patchy ink, so `bleed` thickens each glyph unevenly. The text stays real, selectable and searchable, with no duplicated copies.
+Kinds: `"paper"`, `"grain"`, `"toner"`, `"ink"`, `"stains"`, `"dust"`, `"lines"`, `"edges"`. Without `width` and
+`height`, a texture takes the page size.
 
 ## Limitations
 
-- Typst cannot do true perspective or real blur. Bleed and blur are approximated with strokes, transparency and textures.
-- Typst has no per-line hook, so `"line"` granularity rotates each block (paragraph, heading, list…) as a unit.
-- With `"word"` or `"char"` granularity, words are boxed. They can no longer be hyphenated, so justified text with hyphenation can break differently. `"line"` and `"page"` never change the layout.
-- The same word always gets the same inking variation.
+- No true blur or perspective: bleed and blur use textured strokes; `phone-scan` uses rotation and lighting only.
+- `"line"` granularity rotates whole blocks (Typst has no per-line hook). `"word"` boxes words, which prevents
+  hyphenation in justified text; `"char"` shifts characters vertically only.
+- Fraction bars and radical lines in equations are shapes and do not bleed.
 - `scan` replaces the page `background` and `foreground`.
-- Textured ink depends on the PDF viewer. macOS Preview and Typst's own renderer show it fully. Poppler-based viewers draw the outline as plain ink, so the text only looks bolder and bled.
-- `"char"` granularity moves characters vertically only, to keep words whole without boxing them. It can slightly change kerning.
+- Page-sized textures need a fixed page height; with `height: auto`, only paper colour and grain are drawn.
+- Poppler-based viewers draw the textured ink outline as plain ink. Typst 0.15.1 cannot export textured text to
+  PNG; export a PDF and convert it with Ghostscript.
 
-## Accessibility and fair use
+## Documentation
 
-The text remains real, selectable and searchable text. A "scanned" document is still harder to read, especially for people using assistive technologies, so keep a clean version available.
+Full guide, API and settings reference, and internals: <https://kornstein.github.io/lookscanned/>.
 
-This package is meant for design, staging, fiction, games and OCR testing. Do not use it to forge documents.
+## Credits
+
+Part of the Rust texture algorithms and most of the Typst code were written by hand. The rest was built with
+[Claude](https://claude.ai).
+
+The text remains real text, but a "scanned" document is harder to read: keep a clean version available
+(`intensity: 0`). This package is meant for design, fiction, games, props and OCR testing; do not use it to forge
+documents.

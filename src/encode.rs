@@ -23,9 +23,10 @@ impl Img {
         if x < 0 || y < 0 || x >= self.w as i64 || y >= self.h as i64 || alpha <= 0.0 {
             return;
         }
+        let alpha = alpha.min(1.0);
         let i = self.idx(x as u32, y as u32);
         let a0 = self.data[i + self.ch - 1];
-        let a = alpha.min(1.0) + a0 * (1.0 - alpha.min(1.0));
+        let a = alpha + a0 * (1.0 - alpha);
         if self.ch == 2 && a > 0.0 {
             self.data[i] = (grey * alpha + self.data[i] * a0 * (1.0 - alpha)) / a;
         }

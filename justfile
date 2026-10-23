@@ -3,6 +3,7 @@ version := `sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1`
 wasm := "target/wasm32-unknown-unknown/release/lookscanned.wasm"
 dist := "dist/lookscanned/" + version
 typst_packages := env("TYPST_PACKAGES", "../typst-packages")
+presets := "clean-scan office-scan photocopy fax typewriter old-paper phone-scan"
 local_packages := env("TYPST_PACKAGE_PATH", if os() == "macos" { home_directory() / "Library/Application Support/typst/packages" } else { home_directory() / ".local/share/typst/packages" })
 
 default: package
@@ -20,11 +21,18 @@ opt: build
     #!/usr/bin/env bash
     set -euo pipefail
     if command -v wasm-opt > /dev/null; then
-      wasm-opt -Oz --strip-debug typst/lookscanned.wasm -o typst/lookscanned.wasm
+      # Features rustc enables by default for wasm32-unknown-unknown.
+      wasm-opt -Oz --strip-debug --enable-bulk-memory --enable-nontrapping-float-to-int \
+        --enable-sign-ext --enable-mutable-globals typst/lookscanned.wasm -o typst/lookscanned.wasm
     else
       echo "wasm-opt not found, skipping"
     fi
     ls -l typst/lookscanned.wasm
+
+# Formatting and clippy, warnings as errors.
+lint:
+    cargo fmt --check
+    cargo clippy --all-targets -- -D warnings
 
 # Rust unit tests, every test compiles, and effects keep the text and line breaks.
 test: build
@@ -39,17 +47,33 @@ test: build
     if command -v pdftotext > /dev/null; then
       text() { typst compile --root . --input preset="$1" tests/layout.typ "$out/l.pdf" && pdftotext "$out/l.pdf" - | sed 's/(.*)//' | grep -v '^$'; }
       ref=$(text none)
-      for p in clean-scan office-scan photocopy fax typewriter old-paper phone-scan; do
+      for p in {{presets}}; do
         [ "$ref" = "$(text $p)" ] || { echo "layout or text changed with preset $p"; exit 1; }
       done
       echo "layout: ok"
     fi
 
-# Render examples to PNG (for the README).
-examples: build
-    for p in clean-scan office-scan photocopy fax typewriter old-paper phone-scan; do typst compile --root . --input preset=$p tests/layout.typ examples/$p.png --ppi 80; done
-    typst compile --root . examples/features.typ "examples/features-{p}.png" --ppi 80
-    typst compile --root . --input preset=office-scan tests/layout.typ examples/thumbnail.png --ppi 150
+# Render the README images into assets/ (committed), through PDF like docs-images.
+readme-images: build
+    #!/usr/bin/env bash
+    set -euo pipefail
+    out=target/readme
+    mkdir -p "$out" assets
+    png() { gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -r"$1" -dDownScaleFactor=2 -dMaxBitmap=2000000000 -sOutputFile="$3" "$2"; }
+    gallery() { typst compile --root . --input pages="$2" --input columns="$3" ${4:+--input labels="$4"} examples/docs/gallery.typ "$out/$1.pdf"; }
+    typst compile --root . examples/old-textbook.typ "$out/old-textbook.pdf"
+    typst compile --root . examples/problem-sheet.typ "$out/problem-sheet.pdf"
+    presets=""
+    for p in {{presets}}; do
+      typst compile --root . --input fig=preset-$p examples/docs/figures.typ "$out/preset-$p.pdf"
+      presets="$presets,$out/preset-$p.pdf:1"
+    done
+    gallery hero "$out/old-textbook.pdf:2,$out/old-textbook.pdf:3,$out/problem-sheet.pdf:1" 3
+    gallery presets "${presets#,}" 4 "$(echo {{presets}} | tr ' ' ,)"
+    png 200 "$out/hero.pdf" assets/hero.png
+    png 120 "$out/presets.pdf" assets/presets.png
+    png 300 "$out/hero.pdf" assets/thumbnail.png
+    echo "readme images: ok"
 
 # Assemble the Universe package in dist/.
 package: opt
@@ -61,7 +85,7 @@ package: opt
     sed 's/@VERSION@/{{version}}/' typst/typst.toml.in > {{dist}}/typst.toml
     cp typst/README.md {{dist}}/README.md
     cp LICENSE {{dist}}/
-    [ -f examples/thumbnail.png ] && cp examples/thumbnail.png {{dist}}/ || true
+    [ -f assets/thumbnail.png ] && cp assets/thumbnail.png {{dist}}/ || true
     echo "packaged {{dist}}"
 
 # Compile a document against the packaged files.
@@ -87,7 +111,7 @@ publish: check
     mkdir -p "{{typst_packages}}/packages/preview/lookscanned"
     cp -r {{dist}} "{{typst_packages}}/packages/preview/lookscanned/"
 
-docs_figures := "hero preset-clean-scan preset-office-scan preset-photocopy preset-fax preset-typewriter preset-old-paper preset-phone-scan tutorial-1 tutorial-2 tutorial-3 tutorial-4 ink-bleed ink-fade ink-wear ink-legibility paper-aging textures page-override region decorations"
+docs_figures := "hero preset-clean-scan preset-office-scan preset-photocopy preset-fax preset-typewriter preset-old-paper preset-phone-scan start-1 start-2 start-3 start-4 ink-bleed ink-fade ink-wear ink-legibility paper-aging textures page-override region decorations"
 
 # Render the figures of the web documentation into docs/assets/img/ (not committed).
 # Through PDF + Ghostscript: Typst's PNG export panics on text filled with
@@ -102,7 +126,7 @@ docs-images: build
       typst compile --root . --input fig=$f examples/docs/figures.typ "$tmp/$f.pdf"
       out="docs/assets/img/$f.png"
       [ "$f" = page-override ] && out="docs/assets/img/$f-%d.png"
-      gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -r288 -dDownScaleFactor=2 \
+      gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=png16m -r288 -dDownScaleFactor=2 -dMaxBitmap=2000000000 \
         -sOutputFile="$out" "$tmp/$f.pdf"
     done
     echo "docs images: ok"

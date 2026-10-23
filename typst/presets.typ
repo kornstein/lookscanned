@@ -3,26 +3,26 @@
 #let base = (
   paper: (
     color: white,
-    grain: 0, // 0 to 1
+    grain: 0,
     aging: 0, // yellowing, foxing
     fibers: 0,
   ),
   stains: (
     color: rgb("#8b5a2b"),
-    amount: 0, // stain density
+    amount: 0,
     size: (min: 2mm, max: 15mm),
     dust: 0,
     scratches: 0,
   ),
   ink: (
-    bleed: 0, // thicker, smudged glyphs
-    fade: 0, // uneven inking
+    bleed: 0,
+    fade: 0,
     legibility: 1, // 1 = sharp, 0 = barely readable
     wear: 0, // toner dropouts / worn ribbon
     ghosting: false, // offset copies; duplicates text for some extractors
   ),
   skew: (
-    page-rotation: 0deg, // max rotation per page
+    page-rotation: 0deg, // maximum, drawn per page
     line-jitter: 0deg, // rotation per block ("line") or per word ("word")
     char-jitter: 0pt, // offset per word / char
     drift: 0, // 0 = independent pages, 1 = slowly wandering angle
@@ -39,7 +39,7 @@
     bands: 0, // photocopier bands
   ),
   quality: (
-    resolution: 150, // dpi of generated textures
+    resolution: 150, // dpi
     tile: true, // share textures across pages
     granularity: "line", // "page", "line", "word" or "char"
   ),

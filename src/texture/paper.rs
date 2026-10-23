@@ -57,9 +57,9 @@ fn spot(img: &mut Img, cx: f64, cy: f64, r: f64, strength: f64, seed: u64) {
             let d = (dx * dx + dy * dy).sqrt() * (0.8 + 0.4 * fbm(seed, dx * 2.0, dy * 2.0, 2));
             let a = strength * (1.0 - smoothstep(0.4, 1.0, d));
             let i = img.idx(x, y);
-            for c in 0..3 {
+            for (c, fox) in FOX.iter().enumerate() {
                 let v = img.data[i + c] as f64;
-                img.data[i + c] = (v * (1.0 - a) + v * FOX[c] * a) as f32;
+                img.data[i + c] = (v * (1.0 - a) + v * fox * a) as f32;
             }
         }
     }

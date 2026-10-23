@@ -1,7 +1,3 @@
-# Builds the documentation (plugin → figures → Zensical site) on every push and
-# pull request; deploys it to GitHub Pages on pushes to the default branch.
-# Based on https://zensical.org/docs/publish-your-site/
-#
 # One-time setup: Settings → Pages → Build and deployment → Source: GitHub Actions.
 name: Documentation
 
@@ -33,7 +29,6 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install -r requirements-docs.txt
-      # Figures are rendered from examples/docs/figures.typ, never committed.
       - run: just docs-images
       - run: zensical build --clean --strict
       - uses: actions/upload-pages-artifact@v5

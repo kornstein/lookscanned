@@ -1,4 +1,5 @@
-// Page background (paper, grain, stains) and foreground (scanner artefacts, dust, lighting, punch holes).
+// Page background (paper, grain, stains) and foreground (scanner artefacts,
+// dust, lighting, punch holes).
 #import "../wasm.typ": texture
 #import "../validate.typ": resolve
 
@@ -21,7 +22,7 @@
 
 #let _tile = 40mm
 
-// Square tile repeated over the whole layer: one image in the PDF.
+// A tiling is stored once in the PDF, however many pages repeat it.
 #let _tiled(kind, ..args) = rect(
   width: 100%,
   height: 100%,
@@ -38,13 +39,12 @@
   let seed = c.seed * 1000 + p
   let full = page.height != auto
   _layer(
-    if c.paper.grain > 0 or c.paper.aging > 0 {
-      if full { texture("paper", seed: seed, resolution: res, color: c.paper.color, grain: c.paper.grain, aging: c.paper.aging) }
+    if full and (c.paper.grain > 0 or c.paper.aging > 0) {
+      texture("paper", seed: seed, resolution: res, color: c.paper.color, grain: c.paper.grain, aging: c.paper.aging)
     } else if c.paper.color != white {
       rect(width: 100%, height: 100%, fill: c.paper.color)
     },
     if c.paper.grain > 0 or c.paper.fibers > 0 {
-      // Tiled grain is shared by all pages (one image in the PDF).
       let args = (seed: if c.quality.tile { c.seed + 1 } else { seed + 1 }, resolution: res, amount: c.paper.grain, fibers: c.paper.fibers)
       if c.quality.tile or not full { _tiled("grain", ..args) } else { texture("grain", ..args) }
     },
@@ -70,10 +70,10 @@
       texture("edges", seed: seed + 7, resolution: res, shadow: c.edges.shadow, vignette: c.edges.vignette, uneven: c.edges.uneven, binding: c.edges.binding)
     },
     if c.edges.punch-holes and full {
-      // French two-hole filing: 80 mm apart, centred, 12 mm from the edge.
-      for dy in (-40mm, 40mm) {
+      // ISO 838: 6 mm holes, 80 mm apart, centred 12 mm from the edge.
+      block(width: 100%, height: 100%, for dy in (-40mm, 40mm) {
         place(left + horizon, dx: 12mm - 3mm, dy: dy, circle(radius: 3mm, fill: luma(55), stroke: 0.6pt + luma(30)))
-      }
+      })
     },
   )
 }

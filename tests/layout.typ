@@ -4,14 +4,16 @@
 
 #let name = sys.inputs.at("preset", default: "office-scan")
 #set page(paper: "a5")
-#set text(lang: "fr")
 #show: if name == "none" { x => x } else { lookscanned.scan.with(preset: name, seed: 3) }
 
-= Contrat de location
+= Convergence of series
 
-Entre les soussignés, il a été convenu ce qui suit. #lorem(60)
+Let $(u_n)$ be a sequence of non-negative real numbers. The series $sum u_n$
+converges if and only if its partial sums are bounded. #lorem(50)
 
-- Article premier : le bailleur loue au preneur.
-- Article second : le loyer est payable d'avance.
+- Comparison: if $0 <= u_n <= v_n$ and $sum v_n$ converges, so does $sum u_n$.
+- Ratio test: if $u_(n+1) / u_n -> ell < 1$, then $sum u_n$ converges.
 
-#lorem(80)
+$ sum_(n=1)^infinity 1 / n^2 = pi^2 / 6 $
+
+#lorem(70)

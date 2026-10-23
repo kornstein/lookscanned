@@ -1,4 +1,3 @@
-// Path is relative to this file: `lookscanned.wasm` sits next to it.
 #let _plugin = plugin("lookscanned.wasm")
 
 #let _kinds = ("paper", "grain", "toner", "ink", "stains", "dust", "lines", "edges")
@@ -6,7 +5,7 @@
 // Resolution factor per kind: smooth textures are rendered coarser.
 #let _factor = (paper: 1 / 8, stains: 1 / 3, edges: 1 / 10)
 
-// Random table: `bytes`, read through `rnd` in effects/jitter.typ.
+// `TABLE_LEN` random bytes, read through `rnd` in effects/jitter.typ.
 #let random-table(seed) = _plugin.random(cbor.encode(seed))
 
 // Raw PNG bytes of a texture. `w`/`h` in pixels; colours and pixel lengths
@@ -23,7 +22,7 @@
 
 /// Generates a texture as an image sized to `width` × `height` (the page by default).
 ///
-/// - kind: "paper", "grain", "toner", "stains", "dust", "lines" or "edges".
+/// - kind: "paper", "grain", "toner", "ink", "stains", "dust", "lines" or "edges".
 /// - seed: same seed, same texture.
 /// - resolution: dpi of the generated image (smooth kinds use a fraction of it).
 /// - ..args: texture parameters (`color`, `amount`, `grain`, `aging`, `min`, `max`…).

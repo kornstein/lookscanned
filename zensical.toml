@@ -1,8 +1,8 @@
 [project]
 site_name = "lookscanned"
 site_url = "https://kornstein.github.io/lookscanned/"
-site_description = "Make Typst documents look scanned, photocopied, faxed or typewritten."
-site_author = "Célestin Besson"
+site_description = "Scanned, photocopied, faxed and typewritten looks for Typst documents."
+site_author = "Instelce"
 copyright = "Apache-2.0 licensed"
 repo_url = "https://github.com/kornstein/lookscanned"
 repo_name = "kornstein/lookscanned"
@@ -10,17 +10,17 @@ edit_uri = "edit/main/docs/"
 
 nav = [
   { "Home" = "index.md" },
-  { "Tutorial" = ["tutorial/first-scanned-document.md"] },
-  { "How-to guides" = [
-    "how-to/choose-a-preset.md",
-    "how-to/tune-the-ink.md",
-    "how-to/age-the-paper.md",
-    "how-to/damage-one-page.md",
-    "how-to/scan-a-region.md",
-    "how-to/stamps-and-notes.md",
-    "how-to/custom-presets.md",
-    "how-to/control-pdf-size.md",
-    "how-to/raw-textures.md",
+  { "Getting started" = "getting-started.md" },
+  { "Guide" = [
+    "guide/presets.md",
+    "guide/ink.md",
+    "guide/paper.md",
+    "guide/mathematics.md",
+    "guide/pages-and-regions.md",
+    "guide/decorations.md",
+    "guide/custom-presets.md",
+    "guide/performance.md",
+    "guide/textures.md",
   ] },
   { "Reference" = [
     "reference/api.md",
@@ -28,12 +28,11 @@ nav = [
     "reference/presets.md",
     "reference/textures.md",
   ] },
-  { "Explanation" = [
-    "explanation/how-it-works.md",
-    "explanation/limitations.md",
-    "explanation/responsible-use.md",
+  { "Internals" = [
+    "internals/architecture.md",
+    "internals/limitations.md",
   ] },
-  { "Contributing" = ["contributing/development.md"] },
+  { "Development" = "development.md" },
 ]
 
 [project.theme]

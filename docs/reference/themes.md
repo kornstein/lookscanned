@@ -50,7 +50,7 @@ Numbers must be non-negative. Amounts are designed for the range 0 to 1; larger 
 | `vignette` | number | `0` | Darker corners. |
 | `uneven` | number | `0` | Light coming from one side. |
 | `binding` | `bool` | `false` | Gutter shadow along the left edge. |
-| `punch-holes` | `bool` | `false` | Two filing holes on the left, 80 mm apart, 12 mm from the edge. |
+| `punch-holes` | `bool` | `false` | Two 6 mm filing holes on the left, 80 mm apart, centred 12 mm from the edge (ISO 838). |
 
 ## `scanner`
 
@@ -67,7 +67,7 @@ Numbers must be non-negative. Amounts are designed for the range 0 to 1; larger 
 | `tile` | `bool` | `true` | Repeat one grain tile on every page instead of a full-page grain per page. |
 | `granularity` | `str` | `"line"` | What jitters: `"page"`, `"line"`, `"word"` or `"char"`. |
 
-See [Control PDF size](../how-to/control-pdf-size.md) for the trade-offs.
+See [Performance](../guide/performance.md) for the trade-offs.
 
 ## Intensity
 

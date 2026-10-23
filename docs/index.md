@@ -4,68 +4,60 @@ title: lookscanned
 
 # lookscanned
 
-**Make a Typst document look scanned, photocopied, faxed or typed on a typewriter.**
+**A Typst package that renders documents as if they had been scanned, photocopied, faxed or typed.**
 
-lookscanned adds paper grain, stains, dust, bleeding ink and slightly rotated pages to any Typst document. A small WebAssembly plugin generates the textures and the randomness, and Typst applies the effects. As a result:
+lookscanned adds paper texture, stains, dust, scanner lighting, page rotation and ink effects to a Typst document. The textures and the randomness come from a WebAssembly plugin written in Rust; the effects are applied by Typst itself. The package guarantees three properties:
 
-- the text stays real text: selectable, searchable, copyable;
-- the layout does not move: line and page breaks are the same as without the effect;
-- the same `seed` always gives the same result.
+- **Text is preserved.** Glyphs are never rasterised. Text stays selectable, searchable and readable by assistive technologies.
+- **Layout is preserved.** Line and page breaks are identical with and without the effect (verified by the test suite for every preset).
+- **Rendering is deterministic.** The same source and the same `seed` produce the same PDF.
 
 <figure markdown>
-![A rental agreement rendered with the office-scan preset, with a red "Received" stamp](assets/img/hero.png)
-<figcaption>The <code>office-scan</code> preset with a stamp.</figcaption>
+![An excerpt on Cauchy sequences rendered with the old-paper preset](assets/img/hero.png)
+<figcaption>The <code>old-paper</code> preset on a page of lecture notes.</figcaption>
 </figure>
 
-## Quick start
+## Minimal example
 
 ```typst
 #import "@preview/lookscanned:0.1.0"
 
-#show: lookscanned.scan.with(preset: "office-scan")
+#show: lookscanned.scan.with(preset: "old-paper", seed: 3)
 
-= Rental agreement
-Between the undersigned, it has been agreed as follows…
+= Cauchy sequences
+A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
+exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
 ```
 
 !!! warning "Not on Typst Universe yet"
 
-    Until the package is published, install it locally and import `@local/lookscanned:0.1.0` instead. See [Development](contributing/development.md#install-the-package-locally).
+    Until the package is published, install it locally and import `@local/lookscanned:0.1.0`. See [Development](development.md#local-installation).
 
-## Where to go next
+## Contents
 
-<div class="grid cards" markdown>
+| Section | Content |
+|---|---|
+| [Getting started](getting-started.md) | Installation and a step-by-step first document |
+| **Guide** | |
+| [Presets](guide/presets.md) | The seven built-in looks, `intensity` and `seed` |
+| [Ink](guide/ink.md) | Bleed, fade, wear, legibility, ghosting |
+| [Paper and scanner](guide/paper.md) | Paper colour and ageing, stains, dust, lighting, fax lines |
+| [Mathematics](guide/mathematics.md) | Equations, templates such as mousse-notes, fonts |
+| [Pages and regions](guide/pages-and-regions.md) | Per-page overrides and partial effects |
+| [Decorations](guide/decorations.md) | Stamps, handwritten notes, stains |
+| [Custom presets](guide/custom-presets.md) | Defining, deriving and sharing presets |
+| [Performance](guide/performance.md) | Compile time and PDF size |
+| [Raw textures](guide/textures.md) | Using the generated images directly |
+| **Reference** | |
+| [API](reference/api.md) | Every public function and its arguments |
+| [Themes](reference/themes.md) | Every setting, its type and neutral value; intensity scaling |
+| [Presets](reference/presets.md) | Exact values of the built-in presets |
+| [Textures](reference/textures.md) | Texture kinds and their parameters |
+| **Internals** | |
+| [Architecture](internals/architecture.md) | Plugin protocol, rendering pipeline, determinism |
+| [Limitations](internals/limitations.md) | Known constraints, viewer support, responsible use |
+| [Development](development.md) | Building, testing, packaging, documentation |
 
--   __Tutorial__
+## Requirements
 
-    ---
-
-    Start here. Turn a plain document into a convincing scan in a few steps.
-
-    [Your first scanned document](tutorial/first-scanned-document.md)
-
--   __How-to guides__
-
-    ---
-
-    Recipes for specific goals: pick a preset, tune the ink, age the paper, damage one page, add a stamp.
-
-    [Choose a preset](how-to/choose-a-preset.md)
-
--   __Reference__
-
-    ---
-
-    Every function, theme, key and default value.
-
-    [API](reference/api.md) · [Themes](reference/themes.md) · [Presets](reference/presets.md) · [Textures](reference/textures.md)
-
--   __Explanation__
-
-    ---
-
-    How it works, what it cannot do, and how to use it responsibly.
-
-    [How it works](explanation/how-it-works.md)
-
-</div>
+Typst 0.14 or later. No external tool is needed to compile a document: the plugin ships inside the package.

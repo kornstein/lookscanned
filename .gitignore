@@ -3,7 +3,6 @@
 /target
 /dist
 typst/lookscanned.wasm
-examples/*.png
-!examples/thumbnail.png
 docs/assets/img/
 site/
+/specs

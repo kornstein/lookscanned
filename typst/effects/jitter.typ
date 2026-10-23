@@ -1,6 +1,6 @@
 // Seeded geometric irregularities. Randomness comes from the plugin's table,
 // indexed by cheap hashes, so no plugin call happens per glyph.
-#import "ghosting.typ": ink
+#import "ink.typ": ink
 
 #let _P = 2147483647
 
@@ -70,6 +70,11 @@
   if cj == 0pt { return body }
   text(baseline: cj * r(2), body)
 }
+
+// Math letters and symbols are not `text` elements, so the ink is set on the
+// whole equation. Digits and upright runs still reach `text-effect`, which
+// finds a tiling fill and leaves their paint alone.
+#let math-effect(it, cfg) = ink(it, cfg, rnd(cfg.table, cfg.seed, str-hash(repr(it.body)), 4))
 
 // The `show text` rule: ink on every run, plus word or char jitter.
 #let text-effect(it, cfg) = {

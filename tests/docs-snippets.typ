@@ -6,7 +6,7 @@
 // reference/api.md
 #assert.eq(lookscanned.presets.keys(), ("clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper", "phone-scan"))
 
-// how-to/custom-presets.md: theme-wise merge keeps the other ink keys.
+// guide/custom-presets.md: theme-wise merge keeps the other ink keys.
 #let p = lookscanned.presets
 #let soft-fax = p.fax + (ink: p.fax.ink + (bleed: 0.2))
 #assert.eq(soft-fax.ink, (bleed: 0.2, fade: 0.35, legibility: 0.6, wear: 0.45))
@@ -15,6 +15,9 @@
   ink: (bleed: 0.5, fade: 0.2),
   skew: (page-rotation: 0.8deg),
   edges: (shadow: 0.4),
+)
+#let library-copy = lookscanned.presets.at("old-paper") + (
+  edges: (binding: true, shadow: 0.4, vignette: 0.5),
 )
 
 #show: lookscanned.scan.with(
@@ -30,23 +33,33 @@
   quality: (resolution: 100, tile: true, granularity: "line"),
 )
 
-= Report
-#lorem(20)
+= Cauchy sequences
+A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
+exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
 
-#lookscanned.stamp("Received")
-#lookscanned.stamp("Paid", color: rgb("#1f4e9c"), angle: 8deg, at: (x: 70%, y: 80%))
-#lookscanned.scribble(body: "Seen, OK", color: blue)
-#lookscanned.scribble(width: 3.5cm, seed: 4)
+// guide/decorations.md
+#lookscanned.stamp("Library copy", color: rgb("#5b3a8c"))
+#lookscanned.stamp("Marked", angle: 9deg, at: (x: 70%, y: 80%))
+#lookscanned.scribble(body: "see Thm 1.4", color: blue)
+#lookscanned.scribble(width: 3.2cm, seed: 4)
 #lookscanned.stain(at: (x: 60%, y: 20%), color: rgb("#6b4423"), size: 25mm)
 #lookscanned.stain()
 
 #pagebreak()
 #lookscanned.page(preset: my-scan, stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
-  = Damaged appendix
+  = Appendix: tables
   #lorem(20)
 ]
 
-// how-to/raw-textures.md
+#pagebreak()
+#lookscanned.page(preset: library-copy)[#lorem(10)]
+
+// guide/textures.md
 #let grain = tiling(size: (4cm, 4cm), lookscanned.texture("grain", width: 4cm, height: 4cm, amount: 0.6))
 #rect(width: 100%, height: 1cm, fill: grain)
 #lookscanned.texture("stains", width: 2cm, height: 2cm, count: 1, min: 15mm, max: 18mm)
+
+#set page(background: {
+  place(lookscanned.texture("paper", seed: 1, color: rgb("#f4efe4"), aging: 0.3))
+  place(center + horizon, text(60pt, fill: luma(225))[DRAFT])
+})

@@ -1,9 +1,5 @@
-// lookscanned: make a Typst document look scanned, photocopied, faxed or typed.
-//
-//   #import "@preview/lookscanned:0.1.0"
-//   #show: lookscanned.scan.with(preset: "office-scan", seed: 42)
-//
-// Everything defined at the top level of this file is public.
+// Public API: everything defined at the top level of this file. Imports are
+// aliased with `_` to stay private.
 #import "presets.typ": presets
 #import "wasm.typ": texture
 #import "decor.typ": scribble, stain, stamp
@@ -37,10 +33,12 @@
   set page(background: _page.background(cfg), foreground: _page.foreground(cfg))
   show _blocks: it => _jitter.block-skew(it, cfg-at)
   show text: it => _jitter.text-effect(it, cfg)
+  show math.equation: it => _jitter.math-effect(it, cfg)
   body
 }
 
-// Defined after `scan`, which captured the built-in `page` for its set rule.
+// Shadows the built-in `page`: must stay defined after `scan`, whose set rule
+// needs the original.
 
 /// Overrides the settings for the page(s) spanned by `body`: paper, stains,
 /// edges, scanner and page rotation. Text effects (ink, char/word jitter)
@@ -65,5 +63,6 @@
   })
   let angle = cfg.skew.page-rotation * _jitter.rnd(cfg.table, cfg.seed, 7)
   show text: it => _jitter.text-effect(it, cfg)
+  show math.equation: it => _jitter.math-effect(it, cfg)
   block(width: 100%, rotate(angle, reflow: false, block(width: 100%, fill: fill, inset: 0.8em, body)))
 }

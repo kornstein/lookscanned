@@ -1,11 +1,7 @@
-// Ink without rasterising the text. Glyphs stay real, selectable text; only
-// their paint changes:
-// - fill: a tiling of mottled ink with pinholes (`wear`, low `legibility`),
-// - stroke: a tiling of patchy ink, so `bleed` grows each glyph unevenly, as
-//   ink wicking into paper fibres (soft, halo-like when legibility drops),
-// - per-word fade (mixed with the paper colour), quantised so only a few
-//   textures are generated,
-// - optional faint offset copies (`ghosting`).
+// Ink effects. Glyphs stay real text; only their paint changes: the fill
+// becomes a tiling of mottled ink, the stroke a tiling of patchy ink so that
+// `bleed` grows each glyph unevenly. Fading is quantised to `_levels` so only
+// a few distinct tilings end up in the PDF.
 #import "../wasm.typ": texture
 
 #let _tile = 8mm

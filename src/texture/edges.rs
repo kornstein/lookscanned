@@ -26,11 +26,11 @@ pub fn edges(p: &Params) -> Img {
     let light = rng.range(0.0, std::f64::consts::TAU);
     let (lx, ly) = (light.cos(), light.sin());
 
+    let (wm, hm) = (w as f64 * mm, h as f64 * mm);
     let mut img = Img::new(w, h, 2);
     for y in 0..h {
         for x in 0..w {
             let (xm, ym) = (x as f64 * mm, y as f64 * mm);
-            let (wm, hm) = (w as f64 * mm, h as f64 * mm);
             let dist = [xm, wm - xm, ym, hm - ym];
             let mut clear = 1.0;
             for (i, &(s, width)) in sides.iter().enumerate() {
@@ -43,7 +43,8 @@ pub fn edges(p: &Params) -> Img {
             let r = (u * u + v * v).sqrt() * std::f64::consts::SQRT_2;
             clear *= 1.0 - vignette * 0.45 * smoothstep(0.35, 1.1, r);
             let ramp = (u * lx + v * ly + 0.7) / 1.4;
-            clear *= 1.0 - uneven * 0.35 * smoothstep(0.0, 1.0, ramp) * (0.7 + 0.6 * fbm(seed ^ 7, u * 2.0, v * 2.0, 2));
+            clear *=
+                1.0 - uneven * 0.35 * smoothstep(0.0, 1.0, ramp) * (0.7 + 0.6 * fbm(seed ^ 7, u * 2.0, v * 2.0, 2));
             if binding {
                 clear *= 1.0 - 0.75 * (-xm / 7.0).exp() - 0.25 * (-xm / 25.0).exp();
             }

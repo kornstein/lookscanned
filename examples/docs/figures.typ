@@ -1,30 +1,31 @@
-// Figures of the web documentation. One figure per compilation:
+// Figures of the web documentation, one per compilation:
 //
-//   typst compile --root . --input fig=preset-fax examples/docs/figures.typ out.png
+//   typst compile --root . --input fig=preset-fax examples/docs/figures.typ out.pdf
 //
 // `just docs-images` renders all of them into docs/assets/img/.
 #import "/typst/lib.typ" as lookscanned
 
 #let fig = sys.inputs.at("fig", default: "hero")
 
-#let letter = [
-  = Rental agreement
+#let excerpt = [
+  = Cauchy sequences
 
-  Between the undersigned, it has been agreed as follows. The landlord rents
-  to the tenant the premises described below, for a period of three years
-  starting on the first of March. The rent is payable monthly and in advance.
+  A sequence $(u_n)$ of real numbers is a _Cauchy sequence_ if for every
+  $epsilon > 0$ there exists $N in NN$ such that $abs(u_p - u_q) <= epsilon$
+  for all $p, q >= N$.
 
-  - Article 1: the premises are let unfurnished.
-  - Article 2: the deposit equals two months of rent.
+  *Theorem 1.4.* A real sequence converges if and only if it is a Cauchy
+  sequence. In particular, for $abs(q) < 1$,
+  $ sum_(n=0)^infinity q^n = 1 / (1 - q). $
 ]
 
 // Same layout everywhere, so figures can be compared side by side.
-#let page-setup = (width: 12cm, height: 8.5cm, margin: (x: 1cm, y: 0.9cm))
+#let page-setup = (width: 12cm, height: 7cm, margin: (x: 1cm, y: 0.9cm))
 
 // Neutral settings for ink close-ups: no rotation, no page effects.
 #let still = (skew: (page-rotation: 0deg, line-jitter: 0deg, char-jitter: 0pt))
 
-#let sample = [*Rental agreement*, signed in Paris. The rent is payable monthly.]
+#let sample = [*Theorem.* Every bounded monotone sequence converges: $u_n -> sup_k u_k$.]
 
 #let ink-row(label, ..overrides) = (
   text(size: 8pt, fill: luma(90), raw(label)),
@@ -32,23 +33,24 @@
 )
 
 #let ink-figure(rows) = {
-  set page(width: 14cm, height: auto, margin: 0.6cm)
+  set page(width: 15cm, height: auto, margin: 0.6cm)
   grid(columns: (3.2cm, 1fr), align: horizon, column-gutter: 0.4cm, row-gutter: 0.35cm, ..rows.flatten())
 }
 
 #let texture-cell(label, body) = stack(spacing: 4pt, box(stroke: 0.4pt + luma(200), body), text(size: 8pt, raw(label)))
 
-#set text(font: "Libertinus Serif", size: 10pt)
+#set text(font: "New Computer Modern", size: 10pt)
+#set par(justify: true)
 
 #if fig.starts-with("preset-") or fig == "hero" {
-  let name = if fig == "hero" { "office-scan" } else { fig.slice(7) }
+  let name = if fig == "hero" { "old-paper" } else { fig.slice(7) }
   set page(..page-setup)
   show: lookscanned.scan.with(preset: name, seed: 3)
-  letter
-  if fig == "hero" { lookscanned.stamp("Received", at: (x: 66%, y: 74%), size: 12pt) }
-} else if fig.starts-with("tutorial-") {
+  excerpt
+  if fig == "hero" { lookscanned.scribble(body: "complete!", color: rgb("#2a3f8f"), at: (x: 70%, y: 78%)) }
+} else if fig.starts-with("start-") {
   set page(..page-setup)
-  let step = int(fig.slice(9))
+  let step = int(fig.slice(6))
   show: if step == 1 { x => x } else if step == 2 {
     lookscanned.scan.with(preset: "office-scan")
   } else if step == 3 {
@@ -62,8 +64,8 @@
       ink: (bleed: 0.6),
     )
   }
-  letter
-  if step == 4 { lookscanned.stamp("Received", at: (x: 66%, y: 74%), size: 12pt) }
+  excerpt
+  if step == 4 { lookscanned.stamp("Library copy", color: rgb("#5b3a8c"), at: (x: 62%, y: 76%), size: 10pt) }
 } else if fig == "ink-bleed" {
   ink-figure(((0, 0.4, 0.8, 1.2).map(b => ink-row("bleed: " + str(b), ink: (bleed: b)))))
 } else if fig == "ink-fade" {
@@ -95,27 +97,28 @@
 } else if fig == "page-override" {
   set page(..page-setup)
   show: lookscanned.scan.with(preset: "office-scan", seed: 3)
-  [= Report
+  [= Lecture notes
   #lorem(30)]
   pagebreak()
   lookscanned.page(stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
-    = Damaged appendix
+    = Appendix: tables
     #lorem(30)
   ]
 } else if fig == "region" {
   set page(width: 12cm, height: auto, margin: 0.8cm)
-  [This paragraph stays clean. #lorem(18)]
-  lookscanned.region(preset: "fax", seed: 2)[
-    *Appendix B.* This part looks like it came in by fax. #lorem(22)
+  [The proof below is reproduced from the original 1958 edition. #lorem(14)]
+  lookscanned.region(preset: "typewriter", seed: 2)[
+    *Proof.* Let $epsilon > 0$ and choose $N$ such that $abs(u_n - ell) <= epsilon$
+    for all $n >= N$. Then $abs(u_p - u_q) <= 2 epsilon$ for all $p, q >= N$.
   ]
-  [Back to clean text. #lorem(10)]
+  [The converse requires the completeness of $RR$. #lorem(10)]
 } else if fig == "decorations" {
-  set page(width: 12cm, height: 6cm, margin: 0.8cm, fill: rgb("#f7f5ef"))
-  lookscanned.stamp("Received", at: (x: 0cm, y: 0.4cm))
-  lookscanned.stamp("Paid", color: rgb("#1f4e9c"), angle: 8deg, seed: 3, at: (x: 5.6cm, y: 0.2cm))
-  lookscanned.scribble(body: "Seen, OK", at: (x: 0.2cm, y: 2.9cm))
-  lookscanned.scribble(width: 3.5cm, seed: 4, at: (x: 4.2cm, y: 3cm))
-  lookscanned.stain(at: (x: 9cm, y: 3.2cm), size: 22mm)
+  set page(width: 12cm, height: 6.5cm, margin: 0.8cm, fill: rgb("#f7f5ef"))
+  lookscanned.stamp("Library copy", color: rgb("#5b3a8c"), size: 13pt, at: (x: 0cm, y: 0.5cm))
+  lookscanned.stamp("Marked", angle: 9deg, size: 13pt, seed: 3, at: (x: 6.9cm, y: 1.9cm))
+  lookscanned.scribble(body: "see Thm 1.4", at: (x: 0.2cm, y: 3.4cm))
+  lookscanned.scribble(width: 3.2cm, seed: 4, at: (x: 3.4cm, y: 3.6cm))
+  lookscanned.stain(at: (x: 9.6cm, y: 0.6cm), size: 18mm)
 } else {
   panic("unknown figure " + repr(fig))
 }
