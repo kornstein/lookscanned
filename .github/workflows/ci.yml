@@ -12,7 +12,7 @@ jobs:
           components: rustfmt, clippy
       - uses: extractions/setup-just@v2
       - uses: typst-community/setup-typst@v4
-      - run: sudo apt-get install -y poppler-utils binaryen
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils binaryen
       - run: just lint
       - run: just test
       - run: just check
