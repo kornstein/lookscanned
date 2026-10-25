@@ -15,6 +15,11 @@ reproducible from its seed.
 
 ![A textbook excerpt with the old-paper preset and a photocopied problem sheet](assets/hero.png)
 
+> [!NOTE]
+>
+> This project is still under development. If you encounter an error, you can report it to us by opening an issue.
+
+
 ## Features
 
 - **7 presets**: `clean-scan`, `office-scan`, `photocopy`, `fax`, `typewriter`, `old-paper` and `phone-scan`.
@@ -33,9 +38,6 @@ reproducible from its seed.
 ```typst
 #import "@preview/lookscanned:0.1.0"
 ```
-
-Until the package is on [Typst Universe](https://typst.app/universe), install it locally from a clone (see
-[Building from source](#building-from-source)) and import `@local/lookscanned:0.1.0`.
 
 ## Usage
 
@@ -124,7 +126,7 @@ lookscanned
 
 ## Credits
 
-Part of the Rust texture algorithms and most of the Typst code were written by hand. The rest was built with
+Part of the Rust texture algorithms and most of the Typst code were written by hand. The rest, and the documentation was built with
 [Claude](https://claude.ai).
 
 lookscanned builds on [wasm-minimal-protocol](https://github.com/astrale-sharp/wasm-minimal-protocol),

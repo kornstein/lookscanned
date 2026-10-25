@@ -29,10 +29,6 @@ A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
 exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
 ```
 
-!!! warning "Not on Typst Universe yet"
-
-    Until the package is published, install it locally and import `@local/lookscanned:0.1.0`. See [Development](development.md#local-installation).
-
 ## Contents
 
 | Section | Content |

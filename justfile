@@ -45,12 +45,14 @@ test: build
       typst compile --root . "$f" "$out/$(basename "$f" .typ).pdf"
     done
     if command -v pdftotext > /dev/null; then
-      text() { typst compile --root . --input preset="$1" tests/layout.typ "$out/l.pdf" && pdftotext "$out/l.pdf" - | sed 's/(.*)//' | grep -v '^$'; }
+      text() { typst compile --root . --input preset="$1" tests/layout.typ "$out/l.pdf" && pdftotext -raw "$out/l.pdf" - | sed 's/(.*)//' | grep -v '^$'; }
       ref=$(text none)
       for p in {{presets}}; do
         [ "$ref" = "$(text $p)" ] || { echo "layout or text changed with preset $p"; exit 1; }
       done
       echo "layout: ok"
+    else
+      echo "pdftotext not found, skipping layout check"
     fi
 
 # Render the README images into assets/ (committed), through PDF like docs-images.
@@ -72,7 +74,6 @@ readme-images: build
     gallery presets "${presets#,}" 4 "$(echo {{presets}} | tr ' ' ,)"
     png 200 "$out/hero.pdf" assets/hero.png
     png 120 "$out/presets.pdf" assets/presets.png
-    png 300 "$out/hero.pdf" assets/thumbnail.png
     echo "readme images: ok"
 
 # Assemble the Universe package in dist/.
@@ -85,7 +86,6 @@ package: opt
     sed 's/@VERSION@/{{version}}/' typst/typst.toml.in > {{dist}}/typst.toml
     cp typst/README.md {{dist}}/README.md
     cp LICENSE {{dist}}/
-    [ -f assets/thumbnail.png ] && cp assets/thumbnail.png {{dist}}/ || true
     echo "packaged {{dist}}"
 
 # Compile a document against the packaged files.

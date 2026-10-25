@@ -12,7 +12,7 @@ Let $(u_n)$ be a sequence of non-negative real numbers. The series $sum u_n$
 converges if and only if its partial sums are bounded. #lorem(50)
 
 - Comparison: if $0 <= u_n <= v_n$ and $sum v_n$ converges, so does $sum u_n$.
-- Ratio test: if $u_(n+1) / u_n -> ell < 1$, then $sum u_n$ converges.
+- Ratio test: if $u_(n+1) \/ u_n -> ell < 1$, then $sum u_n$ converges.
 
 $ sum_(n=1)^infinity 1 / n^2 = pi^2 / 6 $
 

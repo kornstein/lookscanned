@@ -10,4 +10,3 @@ homepage = "https://kornstein.github.io/lookscanned/"
 description = "Make documents look scanned, photocopied, faxed or typewritten, powered by WASM."
 keywords = ["scan", "photocopy", "fax", "typewriter", "paper", "texture", "vintage", "aged", "ink"]
 categories = ["visualization"]
-exclude = ["thumbnail.png"]
