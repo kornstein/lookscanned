@@ -6,3 +6,5 @@ typst/lookscanned.wasm
 docs/assets/img/
 site/
 /specs
+
+.DS_Store

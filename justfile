@@ -106,7 +106,10 @@ install-local: package
     cp -r {{dist}} "{{local_packages}}/local/lookscanned/"
 
 # Copy the package into a clone of typst/packages (TYPST_PACKAGES).
+# README images point at the version tag, which must already be pushed.
 publish: check
+    git ls-remote --exit-code --tags origin "v{{version}}" > /dev/null || { echo "tag v{{version}} is not on origin"; exit 1; }
+    perl -pi -e 's#/lookscanned/main/#/lookscanned/v{{version}}/#g' {{dist}}/README.md
     test -d "{{typst_packages}}/packages/preview" || { echo "{{typst_packages}} is not a typst/packages clone"; exit 1; }
     mkdir -p "{{typst_packages}}/packages/preview/lookscanned"
     cp -r {{dist}} "{{typst_packages}}/packages/preview/lookscanned/"
