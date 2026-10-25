@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://kornstein.github.io/lookscanned/
+    about: Guides, settings reference and API.
+  - name: Known limitations
+    url: https://kornstein.github.io/lookscanned/internals/limitations/
+    about: Constraints of Typst and PDF that lookscanned cannot work around.

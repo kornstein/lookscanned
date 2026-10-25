@@ -1,0 +1,82 @@
+name: Bug report
+description: A compile error, a wrong render or a layout change caused by lookscanned.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [known limitations](https://kornstein.github.io/lookscanned/internals/limitations/) first:
+        PDF viewer differences, PNG export in Typst 0.15.1, blur and perspective are documented there.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: The smallest Typst document that shows the problem, with its `seed` if the result depends on it.
+      render: typst
+      value: |
+        #import "@preview/lookscanned:0.1.0"
+
+        #show: lookscanned.scan.with(preset: "photocopy", seed: 1)
+
+        #lorem(50)
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Error message or screenshots
+      description: The full compiler error, or a screenshot of the render (before/after if relevant).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Compile error / panic
+        - Layout or line breaks changed
+        - Text no longer selectable or searchable
+        - Mathematics
+        - Paper, stains, edges or scanner textures
+        - Ink (bleed, fade, wear, legibility)
+        - Page rotation / skew
+        - "`page`, `region` or decorations (stamp, stain, scribble)"
+        - Settings validation or presets
+        - Compile time
+        - Other
+  - type: input
+    id: version
+    attributes:
+      label: lookscanned version
+      placeholder: 0.1.0, or a commit hash
+    validations:
+      required: true
+  - type: input
+    id: typst
+    attributes:
+      label: Typst version and environment
+      description: Output of `typst --version`, or web app / Tinymist and its version.
+      placeholder: typst 0.14.0, macOS
+    validations:
+      required: true
+  - type: dropdown
+    id: export
+    attributes:
+      label: Export format
+      options:
+        - PDF
+        - PNG
+        - SVG
+        - HTML
+  - type: input
+    id: viewer
+    attributes:
+      label: PDF viewer
+      description: Textured ink is rendered differently across viewers.
+      placeholder: macOS Preview, Evince, Okular, Chrome, Acrobat…

@@ -1,0 +1,42 @@
+name: Feature request
+description: A new preset, effect, setting or improvement.
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New preset
+        - New effect or texture
+        - New setting on an existing theme
+        - Decoration (stamp, stain, scribble…)
+        - Public API (`scan`, `page`, `region`, `texture`)
+        - Performance
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What you would like and the document or use case it is for.
+    validations:
+      required: true
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference
+      description: A scan, photo or example of the look you want to reproduce.
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed usage
+      description: How you imagine calling it, if you have an idea.
+      render: typst
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Workarounds you tried with the current settings, presets or raw textures.
