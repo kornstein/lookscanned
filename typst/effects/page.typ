@@ -1,13 +1,16 @@
-// Page background (paper, grain, stains) and foreground (scanner artefacts,
-// dust, lighting, punch holes).
+// Page background and foreground layers.
 #import "../wasm.typ": texture
 #import "../validate.typ": resolve
 
-// `lookscanned.page` wraps its body between these two labels.
+// Wrap the body of `lookscanned.page`.
 #let start-label = <lookscanned-page-start>
 #let end-label = <lookscanned-page-end>
+// Marks a decoration to paint above the text.
+#let over-label = <lookscanned-over>
+// True inside `scan`.
+#let active = state("lookscanned-scan", false)
 
-// Configuration for page `p`, with `lookscanned.page` overrides. Needs context.
+// Configuration of page `p`. Needs context.
 #let cfg-at(cfg, p) = {
   let starts = query(start-label)
   if starts.len() == 0 { return cfg }
@@ -22,7 +25,7 @@
 
 #let _tile = 40mm
 
-// A tiling is stored once in the PDF, however many pages repeat it.
+// A tiling is stored once in the PDF.
 #let _tiled(kind, ..args) = rect(
   width: 100%,
   height: 100%,
@@ -54,13 +57,22 @@
   )
 }
 
+// Punch holes follow ISO 838.
 #let foreground(cfg) = context {
   let p = here().page()
   let c = cfg-at(cfg, p)
   let res = c.quality.resolution
   let seed = c.seed * 1000 + p
   let full = page.height != auto
+  let e = c.edges
   _layer(
+    ..query(over-label).filter(m => m.location().page() == p).map(m => {
+      let pos = m.location().position()
+      place(top + left, dx: pos.x, dy: pos.y, m.value)
+    }),
+    if (e.folds > 0 or e.dog-ear or e.staple or e.paperclip or e.torn) and full {
+      texture("damage", seed: seed + 8, resolution: res, paper: c.paper.color, folds: e.folds, dog-ear: e.dog-ear, staple: e.staple, paperclip: e.paperclip, torn: e.torn)
+    },
     if c.scanner.lines > 0 and full { texture("lines", seed: seed + 4, resolution: res, amount: c.scanner.lines, axis: "h") },
     if c.scanner.bands > 0 and full { texture("lines", seed: seed + 5, resolution: res, amount: c.scanner.bands, axis: "v") },
     if (c.stains.dust > 0 or c.stains.scratches > 0) and full {
@@ -70,7 +82,6 @@
       texture("edges", seed: seed + 7, resolution: res, shadow: c.edges.shadow, vignette: c.edges.vignette, uneven: c.edges.uneven, binding: c.edges.binding)
     },
     if c.edges.punch-holes and full {
-      // ISO 838: 6 mm holes, 80 mm apart, centred 12 mm from the edge.
       block(width: 100%, height: 100%, for dy in (-40mm, 40mm) {
         place(left + horizon, dx: 12mm - 3mm, dy: dy, circle(radius: 3mm, fill: luma(55), stroke: 0.6pt + luma(30)))
       })

@@ -15,11 +15,9 @@ nav = [
     "guide/presets.md",
     "guide/ink.md",
     "guide/paper.md",
-    "guide/mathematics.md",
     "guide/pages-and-regions.md",
     "guide/decorations.md",
-    "guide/custom-presets.md",
-    "guide/performance.md",
+    "guide/mathematics.md",
     "guide/textures.md",
   ] },
   { "Reference" = [
@@ -28,10 +26,7 @@ nav = [
     "reference/presets.md",
     "reference/textures.md",
   ] },
-  { "Internals" = [
-    "internals/architecture.md",
-    "internals/limitations.md",
-  ] },
+  { "Internals" = "internals.md" },
   { "Development" = "development.md" },
 ]
 

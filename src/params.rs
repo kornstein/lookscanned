@@ -1,5 +1,4 @@
-//! Parameters sent by `typst/wasm.typ` as a CBOR map with string keys.
-//! Lengths are converted to pixels and colours to `[r, g, b, a]` on the Typst side.
+//! CBOR parameters sent by `typst/wasm.typ`.
 
 use std::collections::HashMap;
 
@@ -73,7 +72,7 @@ impl Params {
         matches!(self.0.get(k), Some(Value::Bool(true)))
     }
 
-    /// RGB colour as floats in [0, 1].
+    /// RGB colour in [0, 1].
     pub fn color(&self, k: &str, default: [f64; 3]) -> [f64; 3] {
         match self.0.get(k) {
             Some(Value::Arr(c)) if c.len() >= 3 => [c[0] / 255.0, c[1] / 255.0, c[2] / 255.0],

@@ -1,14 +1,19 @@
+//! Texture kinds.
+
+mod damage;
 mod dust;
 mod edges;
 mod grain;
 mod ink;
+mod marker;
 mod paper;
 mod stains;
 
 use crate::encode::Img;
 use crate::params::Params;
 
-pub const KINDS: &str = "\"paper\", \"grain\", \"toner\", \"ink\", \"stains\", \"dust\", \"lines\", \"edges\"";
+pub const KINDS: &str =
+    "\"paper\", \"grain\", \"toner\", \"ink\", \"stains\", \"dust\", \"lines\", \"edges\", \"damage\", \"marker\"";
 
 pub fn render(kind: &str, p: &Params) -> Result<Img, String> {
     Ok(match kind {
@@ -20,6 +25,8 @@ pub fn render(kind: &str, p: &Params) -> Result<Img, String> {
         "dust" => dust::dust(p),
         "lines" => dust::lines(p),
         "edges" => edges::edges(p),
+        "damage" => damage::damage(p),
+        "marker" => marker::marker(p),
         other => return Err(format!("unknown texture {other:?}, expected one of {KINDS}")),
     })
 }

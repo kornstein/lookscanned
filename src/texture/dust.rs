@@ -1,5 +1,4 @@
-//! Scanner-glass debris (dust, hairs, scratches) and transfer artefacts
-//! (fax lines, photocopier bands).
+//! Dust, hairs, scratches, fax lines and photocopier bands.
 
 use std::f64::consts::TAU;
 
@@ -7,7 +6,7 @@ use crate::encode::Img;
 use crate::params::Params;
 use crate::rng::{Rng, fbm};
 
-/// Grey + alpha, full page.
+/// Specks, hairs and scratches, as grey + alpha.
 pub fn dust(p: &Params) -> Img {
     let (w, h, seed) = (p.px("w", 64), p.px("h", 64), p.seed());
     let ppmm = p.num("ppmm", 6.0);
@@ -16,7 +15,6 @@ pub fn dust(p: &Params) -> Img {
     let mut rng = Rng::new(seed);
     let area = (w as f64 / ppmm) * (h as f64 / ppmm) / (210.0 * 297.0);
 
-    // Specks: tiny dark blobs.
     for _ in 0..(dust * 350.0 * area) as usize {
         let (cx, cy) = (rng.range(0.0, w as f64), rng.range(0.0, h as f64));
         let r = rng.range(0.04, 0.22) * ppmm * (1.0 + 2.0 * rng.f().powi(6));
@@ -32,13 +30,11 @@ pub fn dust(p: &Params) -> Img {
         }
     }
 
-    // Hairs: curly dark lines of a few millimetres.
     for _ in 0..(dust * 5.0 * area + rng.f() * dust) as usize {
         let len = rng.range(2.0, 9.0) * ppmm;
         walk(&mut img, &mut rng, len, 0.18, 0.15, 0.7);
     }
 
-    // Scratches: long, faint, mostly vertical lines (sliding glass).
     for _ in 0..(scratches * 10.0 * area) as usize {
         let len = rng.range(20.0, 180.0) * ppmm;
         let grey = if rng.chance(0.5) { 1.0 } else { 0.1 };
@@ -67,8 +63,7 @@ fn walk(img: &mut Img, rng: &mut Rng, len: f64, curl: f64, grey: f32, alpha: f32
     }
 }
 
-/// Grey + alpha strip, stretched over the page by Typst:
-/// `axis: "h"` → 1×h horizontal fax lines, `axis: "v"` → w×1 photocopier bands.
+/// Grey + alpha strip stretched by Typst: fax lines ("h") or bands ("v").
 pub fn lines(p: &Params) -> Img {
     let seed = p.seed();
     let amount = p.num("amount", 0.5);
@@ -81,7 +76,6 @@ pub fn lines(p: &Params) -> Img {
     };
 
     if horizontal {
-        // Fax: thin dark lines and white dropouts.
         let mut i = 0i64;
         while i < n as i64 {
             if rng.chance(amount * 0.012) {
@@ -96,7 +90,6 @@ pub fn lines(p: &Params) -> Img {
             i += 1;
         }
     } else {
-        // Photocopier: soft vertical bands plus a few drum streaks.
         for i in 0..n as i64 {
             let b = fbm(seed, i as f64 / n as f64 * 9.0, 0.5, 3);
             set(&mut img, i, 0.1, (amount * 0.22 * (b - 0.35).max(0.0)) as f32);

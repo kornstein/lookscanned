@@ -1,6 +1,6 @@
-//! Raster buffer and minimal PNG encoder (8-bit, no filtering, zlib via miniz_oxide).
+//! Image buffer and PNG encoder.
 
-/// Channels: 2 = grey + alpha, 3 = RGB, 4 = RGBA. Values in [0, 1].
+/// Channels: 2 = grey + alpha, 3 = RGB, 4 = RGBA.
 pub struct Img {
     pub w: u32,
     pub h: u32,
@@ -17,8 +17,7 @@ impl Img {
         (y as usize * self.w as usize + x as usize) * self.ch
     }
 
-    /// Composite `alpha` over the alpha channel (last channel), source-over.
-    /// For grey + alpha, `grey` is blended too. Out-of-bounds is ignored.
+    /// Source-over blend. Out-of-bounds is ignored.
     pub fn blend(&mut self, x: i64, y: i64, grey: f32, alpha: f32) {
         if x < 0 || y < 0 || x >= self.w as i64 || y >= self.h as i64 || alpha <= 0.0 {
             return;
@@ -33,6 +32,22 @@ impl Img {
         self.data[i + self.ch - 1] = a;
     }
 
+    /// Source-over blend of a colour on an RGBA image. Out-of-bounds is ignored.
+    pub fn blend_rgb(&mut self, x: i64, y: i64, rgb: [f32; 3], alpha: f32) {
+        if x < 0 || y < 0 || x >= self.w as i64 || y >= self.h as i64 || alpha <= 0.0 {
+            return;
+        }
+        let alpha = alpha.min(1.0);
+        let i = self.idx(x as u32, y as u32);
+        let a0 = self.data[i + 3];
+        let a = alpha + a0 * (1.0 - alpha);
+        for (c, v) in rgb.iter().enumerate() {
+            self.data[i + c] = (v * alpha + self.data[i + c] * a0 * (1.0 - alpha)) / a;
+        }
+        self.data[i + 3] = a;
+    }
+
+    /// Fast compression: Typst recompresses the image for the PDF.
     pub fn png(&self) -> Vec<u8> {
         let colour_type = match self.ch {
             2 => 4,
@@ -42,7 +57,7 @@ impl Img {
         let row = self.w as usize * self.ch;
         let mut raw = Vec::with_capacity((row + 1) * self.h as usize);
         for r in self.data.chunks(row) {
-            raw.push(0); // filter: none
+            raw.push(0);
             raw.extend(r.iter().map(|v| (v.clamp(0.0, 1.0) * 255.0).round() as u8));
         }
         let mut ihdr = Vec::with_capacity(13);
@@ -52,7 +67,7 @@ impl Img {
 
         let mut out = b"\x89PNG\r\n\x1a\n".to_vec();
         chunk(&mut out, b"IHDR", &ihdr);
-        chunk(&mut out, b"IDAT", &miniz_oxide::deflate::compress_to_vec_zlib(&raw, 6));
+        chunk(&mut out, b"IDAT", &miniz_oxide::deflate::compress_to_vec_zlib(&raw, 1));
         chunk(&mut out, b"IEND", &[]);
         out
     }

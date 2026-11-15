@@ -1,5 +1,4 @@
-//! Lighting overlay: scanner edge shadows, vignette, binding gutter, uneven
-//! light (phone photos). Smooth, so rendered at low resolution.
+//! Lighting: edge shadows, vignette, binding gutter and uneven light.
 
 use crate::encode::Img;
 use crate::params::Params;
@@ -14,8 +13,6 @@ pub fn edges(p: &Params) -> Img {
     let binding = p.bool("binding");
     let mut rng = Rng::new(seed);
 
-    // Per side strength (left, right, top, bottom) and width in mm: one side
-    // usually dominates, as when the sheet does not lie flat on the glass.
     let main = (rng.f() * 4.0) as usize;
     let sides: Vec<(f64, f64)> = (0..4)
         .map(|i| {

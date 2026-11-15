@@ -24,12 +24,8 @@ jobs:
       - uses: extractions/setup-just@v2
       - uses: typst-community/setup-typst@v4
       - run: sudo apt-get update && sudo apt-get install -y ghostscript
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - run: pip install -r requirements-docs.txt
-      - run: just docs-images
-      - run: zensical build --clean --strict
+      - uses: astral-sh/setup-uv@v7
+      - run: just docs-build
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

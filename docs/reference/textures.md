@@ -1,8 +1,6 @@
 # Textures
 
-Kinds accepted by [`lookscanned.texture`](api.md#texture). Every kind takes `seed`, `width`, `height` and `resolution`; the parameters below are specific to each kind. Parameters you omit take the default shown.
-
-Lengths (for example `min`) are converted to pixels at the texture's resolution. Colours are any Typst colour.
+Kinds accepted by [`texture`](api.md#texture). All take `seed`, `width`, `height` and `resolution`; the parameters below are per kind. Lengths are converted to pixels; colours are any Typst colour.
 
 | Kind | Output | Resolution used | Tiles seamlessly |
 |---|---|---|---|
@@ -14,6 +12,8 @@ Lengths (for example `min`) are converted to pixels at the texture's resolution.
 | `dust` | grey with transparency | full | no |
 | `lines` | grey with transparency, one pixel thick | full | no |
 | `edges` | black with transparency | 1/10 | no |
+| `damage` | colour, opaque where the paper is missing | 1/2 | no |
+| `marker` | colour with transparency | full | no |
 
 ## `paper`
 
@@ -90,3 +90,25 @@ A one-pixel strip, stretched over the image without smoothing.
 | `vignette` | `0` | Darker corners. |
 | `uneven` | `0` | One-sided lighting. |
 | `binding` | `false` | Gutter shadow on the left. |
+
+## `damage`
+
+Paper damage, drawn above the text.
+
+| Parameter | Default | Description |
+|---|---|---|
+| `paper` | `white` | Paper colour, used for the back of the folded corner. |
+| `folds` | `0` | Number of horizontal creases, evenly spaced. |
+| `dog-ear` | `false` | Top-right corner folded over the page. |
+| `staple` | `false` | Staple across the top-left corner. |
+| `paperclip` | `false` | Rust marks left by a paperclip on the top edge. |
+| `torn` | `false` | Bottom edge torn off. |
+
+## `marker`
+
+A single highlighter stroke across the image, with chisel ends, used by `highlighter`. The band fills 80% of the height, leaving room for its wobble.
+
+| Parameter | Default | Description |
+|---|---|---|
+| `color` | `rgb("#ffe94d")` | Marker colour. |
+| `opacity` | `0.55` | Ink density. |

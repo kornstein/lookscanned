@@ -4,56 +4,38 @@ title: lookscanned
 
 # lookscanned
 
-**A Typst package that renders documents as if they had been scanned, photocopied, faxed or typed.**
-
-lookscanned adds paper texture, stains, dust, scanner lighting, page rotation and ink effects to a Typst document. The textures and the randomness come from a WebAssembly plugin written in Rust; the effects are applied by Typst itself. The package guarantees three properties:
-
-- **Text is preserved.** Glyphs are never rasterised. Text stays selectable, searchable and readable by assistive technologies.
-- **Layout is preserved.** Line and page breaks are identical with and without the effect (verified by the test suite for every preset).
-- **Rendering is deterministic.** The same source and the same `seed` produce the same PDF.
+**Make a Typst document look scanned, photocopied, faxed or typewritten.**
 
 <figure markdown>
-![An excerpt on Cauchy sequences rendered with the old-paper preset](assets/img/hero.png)
-<figcaption>The <code>old-paper</code> preset on a page of lecture notes.</figcaption>
+![Lecture notes rendered with the old-paper preset](assets/img/hero.png)
+<figcaption>The <code>old-paper</code> preset.</figcaption>
 </figure>
 
-## Minimal example
-
 ```typst
-#import "@preview/lookscanned:0.1.0"
+#import "@preview/lookscanned:0.2.0"
 
 #show: lookscanned.scan.with(preset: "old-paper", seed: 3)
-
-= Cauchy sequences
-A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
-exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
 ```
 
-## Contents
+lookscanned adds paper, stains, dust, lighting, page rotation and textured ink. Three guarantees:
 
-| Section | Content |
+- **Text stays text.** Nothing is rasterised: text and equations remain selectable, searchable and accessible.
+- **Layout is unchanged.** Line and page breaks match the clean document (tested for every preset).
+- **Rendering is deterministic.** Same source and `seed`, same PDF.
+
+Requires Typst 0.14 or later. The Rust plugin ships inside the package; nothing else to install.
+
+## Where to go
+
+| I want to… | Page |
 |---|---|
-| [Getting started](getting-started.md) | Installation and a step-by-step first document |
-| **Guide** | |
-| [Presets](guide/presets.md) | The seven built-in looks, `intensity` and `seed` |
-| [Ink](guide/ink.md) | Bleed, fade, wear, legibility, ghosting |
-| [Paper and scanner](guide/paper.md) | Paper colour and ageing, stains, dust, lighting, fax lines |
-| [Mathematics](guide/mathematics.md) | Equations, templates such as mousse-notes, fonts |
-| [Pages and regions](guide/pages-and-regions.md) | Per-page overrides and partial effects |
-| [Decorations](guide/decorations.md) | Stamps, handwritten notes, stains |
-| [Custom presets](guide/custom-presets.md) | Defining, deriving and sharing presets |
-| [Performance](guide/performance.md) | Compile time and PDF size |
-| [Raw textures](guide/textures.md) | Using the generated images directly |
-| **Reference** | |
-| [API](reference/api.md) | Every public function and its arguments |
-| [Themes](reference/themes.md) | Every setting, its type and neutral value; intensity scaling |
-| [Presets](reference/presets.md) | Exact values of the built-in presets |
-| [Textures](reference/textures.md) | Texture kinds and their parameters |
-| **Internals** | |
-| [Architecture](internals/architecture.md) | Plugin protocol, rendering pipeline, determinism |
-| [Limitations](internals/limitations.md) | Known constraints, viewer support, responsible use |
-| [Development](development.md) | Building, testing, packaging, documentation |
-
-## Requirements
-
-Typst 0.14 or later. No external tool is needed to compile a document: the plugin ships inside the package.
+| Get a first result | [Getting started](getting-started.md) |
+| Pick or build a look | [Presets](guide/presets.md) |
+| Tune the text | [Ink](guide/ink.md) |
+| Tune the sheet: paper, stains, lighting, damage | [Paper and page effects](guide/paper.md) |
+| Change a few pages, or one block | [Pages and regions](guide/pages-and-regions.md) |
+| Add stamps, notes, highlights, stains | [Decorations](guide/decorations.md) |
+| Use it with equations or a template | [Mathematics and templates](guide/mathematics.md) |
+| Speed up compilation, or use raw images | [Performance and textures](guide/textures.md) |
+| Look up an argument | [API](reference/api.md), [Themes](reference/themes.md) |
+| Know the limits | [Internals › Limitations](internals.md#limitations) |

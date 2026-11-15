@@ -1,10 +1,10 @@
-//! Tileable textures: paper grain (+ fibres) and the ink-eating "toner" overlay.
+//! Paper grain and toner tiles.
 
 use crate::encode::Img;
 use crate::params::Params;
 use crate::rng::{Rng, hash2, smoothstep, vnoise};
 
-/// Grey + alpha grain tile. Seamless: white noise, wrapped clumps and fibres.
+/// Grey + alpha grain tile, with fibres.
 pub fn grain(p: &Params) -> Img {
     let (w, h, seed) = (p.px("w", 256), p.px("h", 256), p.seed());
     let ppmm = p.num("ppmm", 6.0);
@@ -12,7 +12,6 @@ pub fn grain(p: &Params) -> Img {
     let fibres = p.num("fibers", 0.0);
     let mut img = Img::new(w, h, 2);
 
-    // Clumps of ~0.5 mm, lattice wrapped on the tile so it repeats cleanly.
     let cells = ((w as f64 / (ppmm * 0.5)).round() as i64).max(1);
     let scale = cells as f64 / w as f64;
     for y in 0..h {
@@ -26,7 +25,6 @@ pub fn grain(p: &Params) -> Img {
         }
     }
 
-    // Fibres: short random walks, wrapped around the tile edges.
     let mut rng = Rng::new(seed ^ 5);
     let area = (w as f64 / ppmm) * (h as f64 / ppmm) / 400.0;
     for _ in 0..(fibres * 12.0 * area) as usize {
@@ -44,8 +42,7 @@ pub fn grain(p: &Params) -> Img {
     img
 }
 
-/// RGBA tile in the paper colour: speckled holes and ribbon-wear streaks that
-/// "eat" the ink once laid over the text.
+/// RGBA tile in the paper colour. Its holes and streaks eat the ink.
 pub fn toner(p: &Params) -> Img {
     let (w, h, seed) = (p.px("w", 256), p.px("h", 256), p.seed());
     let ppmm = p.num("ppmm", 6.0);
@@ -60,7 +57,6 @@ pub fn toner(p: &Params) -> Img {
     for y in 0..h {
         for x in 0..w {
             let (xf, yf) = (x as f64, y as f64);
-            // Streaks are stretched horizontally, like a worn ribbon or drum.
             let s = vnoise(seed ^ 1, xf * ss, yf * ss * 6.0, streak);
             let n = vnoise(seed, xf * sf, yf * sf, fine) * 0.75 + hash2(seed ^ 2, x as i64, y as i64) * 0.25;
             let v = n + (s - 0.5) * 0.35;

@@ -1,36 +1,23 @@
-# Mathematics
-
-lookscanned is designed to work on mathematical documents: lecture notes, problem sheets, theses, reproductions of old textbooks. This page describes how equations are treated and how to combine the package with a document template.
+# Mathematics and templates
 
 ## Equations
 
-Typst lays out math letters and symbols without going through `text` elements, so a `show text` rule alone would ink digits and upright words but leave variables and operators untouched. `scan` and `region` therefore also apply the ink to each `math.equation` as a whole:
+`scan` and `region` ink every equation as a whole: variables, operators and large symbols get the same `bleed`, `fade` and `wear` as the text. Block equations rotate with the page; inline equations move with their paragraph. Equations stay selectable and the layout is unchanged.
 
-- every glyph of an equation, including variables, operators and large symbols, receives the same `bleed`, `fade` and `wear` as the surrounding text;
-- block equations are rotated with the rest of the page, like paragraphs;
-- inline equations move with their paragraph.
+Fraction bars and radical lines are drawn as lines, not glyphs: they do not bleed.
 
-The equation remains real text: it can be selected and copied, and the layout is unchanged.
+## Templates
 
-!!! note "Rules and fraction bars"
-
-    Fraction bars and radical overlines are drawn as lines, not glyphs. They keep a plain stroke and do not bleed.
-
-## Use with a template
-
-A template is usually applied with its own show rule. Place `scan` **before** the template rule when the template requires to be last, as [mousse-notes](https://typst.app/universe/package/mousse-notes/) does:
+Apply `scan` after your `set page` rules and **before** a template rule that must come last, such as [mousse-notes](https://typst.app/universe/package/mousse-notes/):
 
 ```typst
-#import "@preview/lookscanned:0.1.0"
+#import "@preview/lookscanned:0.2.0"
 #import "@preview/mousse-notes:2.0.1": *
 
-#set document(title: [Elements of Analysis], author: "A. N. Example")
 #set page(width: 139.7mm, height: 215.9mm)
 
 #show: lookscanned.scan.with(preset: "old-paper", seed: 12, edges: (binding: true))
 #show: style
-
-#title-page(subtitle: upper[Volume I: Sequences and Series])
 
 = Sequences of Real Numbers
 
@@ -40,19 +27,22 @@ A template is usually applied with its own show rule. Place `scan` **before** th
 ]
 ```
 
-The complete example is [`examples/old-textbook.typ`](https://github.com/kornstein/lookscanned/blob/main/examples/old-textbook.typ). Theorem environments, headers, footers and numbering are all preserved; only their appearance changes.
+Theorem environments, headers, footers and numbering are preserved.
 
-`scan` sets the page `background` and `foreground`. If the template also sets them, the rule applied last wins.
+`scan` sets the page `background` and `foreground`. If the template sets them too, the rule applied last wins.
 
-## Recommended settings
+## Suggested settings
 
 | Document | Settings |
 |---|---|
 | Old textbook | `preset: "old-paper"`, `edges: (binding: true)` |
 | Photocopied problem sheet | `preset: "photocopy"`, `edges: (punch-holes: true)` |
-| Typed thesis draft | `preset: "typewriter"` with a monospaced text font; math keeps its own font |
-| Scanned handwritten-style notes | `preset: "phone-scan"` |
+| Course handout from the 1970s | `preset: "mimeograph"` |
+| Typed thesis draft | `preset: "typewriter"` and a monospaced text font |
+| Archived article | `preset: "microfilm"` |
 
-## Granularity and justification
+Full examples: [`examples/`](https://github.com/kornstein/lookscanned/tree/main/examples), one document per preset.
 
-With `quality.granularity` set to `"word"` or `"char"`, words are boxed or shifted individually and can no longer be hyphenated. Justified, hyphenated paragraphs may then break differently from the clean document. `"line"` (the default for most presets) and `"page"` never change the layout. See [Limitations](../internals/limitations.md#layout-and-granularity).
+## Granularity
+
+`"line"` (most presets) and `"page"` never change the layout. `"word"` (`fax`) and `"char"` (`typewriter`) box words, which prevents hyphenation: justified, hyphenated paragraphs may break differently. See [Limitations](../internals.md#layout-and-granularity).

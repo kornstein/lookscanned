@@ -1,6 +1,6 @@
 # Presets
 
-Each preset lists only the keys that differ from the [neutral values](themes.md). Everything else has no effect. The source of truth is `typst/presets.typ`.
+Each preset lists only the keys that differ from the [neutral values](themes.md). Source: `typst/presets.typ`.
 
 ## `clean-scan`
 
@@ -80,7 +80,7 @@ The default preset.
 
 ## `phone-scan`
 
-Typst cannot apply a true perspective; this preset uses skew and uneven light only.
+No true perspective: rotation and uneven light only.
 
 ```typst
 (
@@ -88,5 +88,44 @@ Typst cannot apply a true perspective; this preset uses skew and uneven light on
   ink: (bleed: 0.2, fade: 0.1),
   skew: (page-rotation: 1.5deg, line-jitter: 0.1deg),
   edges: (shadow: 0.3, vignette: 0.6, uneven: 0.7),
+)
+```
+
+## `mimeograph`
+
+```typst
+(
+  paper: (color: rgb("#f6f3ea"), grain: 0.45, aging: 0.1, fibers: 0.4),
+  stains: (dust: 0.2),
+  ink: (bleed: 0.85, fade: 0.6, legibility: 0.8, wear: 0.3),
+  skew: (page-rotation: 0.7deg, line-jitter: 0.08deg, drift: 0.6),
+  edges: (shadow: 0.2, punch-holes: true, folds: 2),
+  scanner: (bands: 0.3),
+)
+```
+
+## `microfilm`
+
+```typst
+(
+  paper: (color: rgb("#dcdcd6"), grain: 0.6),
+  stains: (color: luma(40), amount: 0.05, dust: 0.6, scratches: 0.7),
+  ink: (bleed: 0.6, fade: 0.2, legibility: 0.75, wear: 0.25),
+  skew: (page-rotation: 1.2deg, line-jitter: 0.05deg, drift: 0.8),
+  edges: (shadow: 0.6, vignette: 0.8, uneven: 0.5),
+  scanner: (lines: 0.4),
+)
+```
+
+## `newsprint`
+
+```typst
+(
+  paper: (color: rgb("#e9e1cc"), grain: 0.6, aging: 0.45, fibers: 0.7),
+  stains: (color: rgb("#9a7444"), amount: 0.2, dust: 0.3),
+  ink: (bleed: 0.65, fade: 0.25, legibility: 0.85, wear: 0.2),
+  skew: (page-rotation: 0.5deg, line-jitter: 0.08deg, drift: 0.4),
+  edges: (shadow: 0.3, vignette: 0.25, uneven: 0.2, folds: 1),
+  scanner: (bands: 0.2),
 )
 ```

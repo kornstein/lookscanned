@@ -1,8 +1,21 @@
 # Themes
 
-Settings are grouped in seven themes. Each theme is a dictionary passed to `scan`, `page` or `region`; keys you omit keep the preset's value. The defaults below are the neutral values (no effect), which a preset then overrides.
+Seven themes, each a dictionary passed to `scan`, `page`, `region` or `derive`. Omitted keys keep the preset's value. The *Neutral* column is the value with no effect.
 
-Numbers must be non-negative. Amounts are designed for the range 0 to 1; larger values exaggerate the effect.
+`none` resets a whole theme or a single key to neutral:
+
+```typst
+#show: lookscanned.scan.with(
+  preset: "old-paper",
+  stains: none, // no stains, dust or scratches
+  ink: (bleed: none), // no bleed, the rest of the preset's ink stays
+)
+
+// No stains on the title page only.
+#lookscanned.page(stains: none)[= Title]
+```
+
+Numbers must be non-negative. Amounts are designed for 0 to 1; larger values exaggerate.
 
 ## `paper`
 
@@ -51,6 +64,11 @@ Numbers must be non-negative. Amounts are designed for the range 0 to 1; larger 
 | `uneven` | number | `0` | Light coming from one side. |
 | `binding` | `bool` | `false` | Gutter shadow along the left edge. |
 | `punch-holes` | `bool` | `false` | Two 6 mm filing holes on the left, 80 mm apart, centred 12 mm from the edge (ISO 838). |
+| `folds` | `int` | `0` | Horizontal creases, evenly spaced. `2` for a letter folded in three. |
+| `dog-ear` | `bool` | `false` | Top-right corner folded over the page. Hides the text under it. |
+| `staple` | `bool` | `false` | Staple across the top-left corner. |
+| `paperclip` | `bool` | `false` | Rust marks of a paperclip on the top edge. |
+| `torn` | `bool` | `false` | Bottom edge torn off, showing the scanner lid. Hides the text under it. |
 
 ## `scanner`
 
@@ -67,14 +85,14 @@ Numbers must be non-negative. Amounts are designed for the range 0 to 1; larger 
 | `tile` | `bool` | `true` | Repeat one grain tile on every page instead of a full-page grain per page. |
 | `granularity` | `str` | `"line"` | What jitters: `"page"`, `"line"`, `"word"` or `"char"`. |
 
-See [Performance](../guide/performance.md) for the trade-offs.
+Trade-offs: [Performance](../guide/textures.md#the-quality-theme).
 
 ## Intensity
 
-`intensity` is applied after the preset and your themes are merged:
+Applied after the preset and your overrides are merged:
 
 - every number, length and angle is multiplied by `intensity`;
 - `legibility` becomes `1 - (1 - legibility) × intensity`, so it degrades proportionally and never goes below 0;
-- these keys are never scaled: `color`, `size`, `drift`, `resolution`, `tile`, `granularity`, `binding`, `punch-holes`, `ghosting`.
+- these keys are never scaled: `color`, `size`, `drift`, `resolution`, `tile`, `granularity`, `binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`, `ghosting`.
 
-With `intensity: 0` every amount, angle and offset is zero. Colours and on/off switches stay: the paper keeps its colour, and `binding` or `punch-holes` are still drawn if enabled.
+With `intensity: 0` every amount, angle and offset is zero, and the on/off switches (`binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`, `ghosting`) are turned off. Only the paper colour stays.

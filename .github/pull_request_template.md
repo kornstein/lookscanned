@@ -21,5 +21,6 @@
 - [ ] `just check` compiles against the packaged files
 - [ ] Renders stay deterministic for a given `seed`, and existing seeds still give the same output (or the change is intended and explained above)
 - [ ] New settings are validated in `typst/validate.typ`, have a neutral value in `typst/presets.typ` and are listed in `docs/reference/themes.md` (add the key to `_fixed` in `typst/validate.typ` if `intensity` must not scale it)
-- [ ] New public functions or snippets are covered in `tests/` (`tests/docs-snippets.typ` for documentation examples)
+- [ ] New public functions or snippets are covered by a case in `tests/cases.typ` (a `docs-*` case for documentation examples)
 - [ ] Documentation and `typst/README.md` are updated; new figures are added to `docs_figures` in the `justfile`
+- [ ] `CHANGELOG.md` has an entry under `[Unreleased]` for any user-visible change (flagged **(render)** if existing seeds render differently)

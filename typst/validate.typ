@@ -1,21 +1,27 @@
+// Argument checks and configuration.
 #import "presets.typ": base, presets
 #import "wasm.typ": random-table
 
 #let _num = (int, float)
 #let _granularities = ("page", "line", "word", "char")
-// Not multiplied by `intensity`.
-#let _fixed = ("color", "ghosting", "size", "drift", "resolution", "tile", "granularity", "binding", "punch-holes")
+// Not scaled by `intensity`.
+#let _fixed = ("color", "ghosting", "size", "drift", "resolution", "tile", "granularity", "binding", "punch-holes", "folds", "dog-ear", "staple", "paperclip", "torn")
+
+// On/off effects, turned off by `intensity: 0`.
+#let _switches = ("ghosting", "binding", "punch-holes", "folds", "dog-ear", "staple", "paperclip", "torn")
 
 #let _same-type(v, d) = type(v) == type(d) or (type(v) in _num and type(d) in _num)
 
-// Checks a dictionary of themes (as passed by the user or a preset) against `base`.
+// Checks themes against `base`.
 #let check-themes(themes, where: "lookscanned") = {
   for (theme, values) in themes {
     assert(theme in base, message: where + ": unknown theme " + repr(theme) + ", expected one of " + base.keys().join(", "))
-    assert(type(values) == dictionary, message: where + ": " + theme + " must be a dictionary, got " + repr(values))
+    if values == none { continue }
+    assert(type(values) == dictionary, message: where + ": " + theme + " must be a dictionary or none, got " + repr(values))
     for (key, v) in values {
       let path = where + ": " + theme + "." + key
       assert(key in base.at(theme), message: path + " is unknown, expected one of " + base.at(theme).keys().join(", "))
+      if v == none { continue }
       let d = base.at(theme).at(key)
       assert(_same-type(v, d), message: path + " must be of type " + str(type(d)) + ", got " + repr(v))
       if type(v) in _num {
@@ -29,27 +35,36 @@
       }
     }
   }
+  let themes = themes.pairs().filter(((_, v)) => v != none).to-dict()
   let q = themes.at("quality", default: (:))
-  if "granularity" in q {
+  if q.at("granularity", default: none) != none {
     assert(q.granularity in _granularities, message: where + ": quality.granularity must be one of " + _granularities.map(repr).join(", ") + ", got " + repr(q.granularity))
   }
-  if "resolution" in q {
+  if q.at("resolution", default: none) != none {
     assert(q.resolution > 0, message: where + ": quality.resolution must be positive")
   }
-  if "legibility" in themes.at("ink", default: (:)) {
+  if themes.at("edges", default: (:)).at("folds", default: none) != none {
+    assert(type(themes.edges.folds) == int, message: where + ": edges.folds must be an integer, got " + repr(themes.edges.folds))
+  }
+  if themes.at("ink", default: (:)).at("legibility", default: none) != none {
     assert(themes.ink.legibility <= 1, message: where + ": ink.legibility must be in [0, 1]")
   }
 }
 
-// Theme-wise merge: `b` overrides `a`, one level deep.
+// `none` stands for the neutral values of `base`, for a theme or a key.
+#let _neutral(theme, values) = if values == none { base.at(theme) } else {
+  values.pairs().map(((k, v)) => (k, if v == none { base.at(theme).at(k) } else { v })).to-dict()
+}
+
+// `b` overrides `a`, within each theme.
 #let merge(a, b) = {
   for (theme, values) in b {
-    a.insert(theme, a.at(theme, default: (:)) + values)
+    a.insert(theme, a.at(theme, default: (:)) + _neutral(theme, values))
   }
   a
 }
 
-// Preset name or dictionary → full set of themes, merged on `base`.
+// All themes of a preset.
 #let preset-themes(preset) = {
   if type(preset) == str {
     assert(preset in presets, message: "lookscanned: unknown preset " + repr(preset) + ", expected one of " + presets.keys().map(repr).join(", ") + " or a dictionary")
@@ -61,13 +76,30 @@
   }
 }
 
-// Multiplies amounts, angles and lengths by `intensity`. Legibility degrades
-// proportionally instead.
+// A preset with some themes changed, key by key.
+#let derive(preset, args) = {
+  let where = "lookscanned.derive"
+  assert(args.pos().len() == 0, message: where + ": unexpected positional arguments " + repr(args.pos()))
+  let preset = if type(preset) == str {
+    assert(preset in presets, message: where + ": unknown preset " + repr(preset) + ", expected one of " + presets.keys().map(repr).join(", ") + " or a dictionary")
+    presets.at(preset)
+  } else {
+    assert(type(preset) == dictionary, message: where + ": preset must be a name or a dictionary, got " + repr(preset))
+    check-themes(preset, where: where + " (preset)")
+    preset
+  }
+  check-themes(args.named(), where: where)
+  merge(preset, args.named())
+}
+
+// Applies `intensity`. Legibility goes the other way.
 #let scale(themes, intensity) = {
   assert(type(intensity) in _num and intensity >= 0, message: "lookscanned: intensity must be a non-negative number, got " + repr(intensity))
   for (theme, values) in themes {
     for (key, v) in values {
-      if key == "legibility" {
+      if intensity == 0 and key in _switches {
+        values.insert(key, base.at(theme).at(key))
+      } else if key == "legibility" {
         values.insert(key, calc.max(0, 1 - (1 - v) * intensity))
       } else if key not in _fixed and type(v) in (int, float, length, angle) {
         values.insert(key, v * intensity)
@@ -78,7 +110,7 @@
   themes
 }
 
-// Splits user arguments into `(preset, intensity, seed, themes)` and validates them.
+// Splits and checks the arguments.
 #let parse-args(args, where) = {
   assert(args.pos().len() == 0, message: where + ": unexpected positional arguments " + repr(args.pos()))
   let named = args.named()
@@ -93,9 +125,7 @@
   opts + (themes: named)
 }
 
-// Parsed arguments → resolved configuration: themes scaled by intensity, plus
-// what effects need (`seed`, random `table`) and what overrides inherit
-// (`raw` themes, `intensity`). Unset options come from `parent`.
+// Final configuration. Missing options come from `parent`.
 #let resolve(opts, parent: none) = {
   let pick(k, fallback) = if opts.at(k) != none { opts.at(k) } else if parent != none { parent.at(k) } else { fallback }
   let raw = if opts.preset != none { preset-themes(opts.preset) } else if parent != none { parent.raw } else { preset-themes("office-scan") }

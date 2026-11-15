@@ -92,8 +92,10 @@
     ("dust", lookscanned.texture("dust", ..s, amount: 1, scratches: 1)),
     ("lines", lookscanned.texture("lines", ..s, amount: 1, axis: "h")),
     ("edges", lookscanned.texture("edges", ..s, shadow: 1, vignette: 1)),
+    ("damage", lookscanned.texture("damage", ..s, folds: 1, dog-ear: true, staple: true)),
+    ("marker", lookscanned.texture("marker", ..s, width: 3cm, height: 0.8cm)),
   )
-  grid(columns: 4, gutter: 0.3cm, ..cells.map(((k, c)) => texture-cell(k, c)))
+  grid(columns: 5, gutter: 0.3cm, ..cells.map(((k, c)) => texture-cell(k, c)))
 } else if fig == "page-override" {
   set page(..page-setup)
   show: lookscanned.scan.with(preset: "office-scan", seed: 3)
@@ -119,6 +121,30 @@
   lookscanned.scribble(body: "see Thm 1.4", at: (x: 0.2cm, y: 3.4cm))
   lookscanned.scribble(width: 3.2cm, seed: 4, at: (x: 3.4cm, y: 3.6cm))
   lookscanned.stain(at: (x: 9.6cm, y: 0.6cm), size: 18mm)
+} else if fig == "damage" {
+  set page(..page-setup)
+  show: lookscanned.scan.with(preset: "old-paper", seed: 3, edges: (folds: 1, dog-ear: true, staple: true, paperclip: true, torn: true))
+  excerpt
+} else if fig == "highlighter" {
+  set page(width: 12cm, height: auto, margin: 0.8cm)
+  show: lookscanned.scan.with(preset: "clean-scan", seed: 2)
+  [A sequence is a #lookscanned.highlighter[_Cauchy sequence_ if for every $epsilon > 0$ there exists $N$ such that $abs(u_p - u_q) <= epsilon$] for all $p, q >= N$.
+  #lookscanned.highlighter(color: rgb("#7be07b"), seed: 5)[Every Cauchy sequence converges.] #lorem(12)]
+  lookscanned.stain(at: (x: 85%, y: 30%), size: 16mm, over: true)
+} else if fig == "strokes" {
+  set page(width: 12cm, height: auto, margin: 0.8cm)
+  show: lookscanned.scan.with(preset: "photocopy", seed: 2, skew: (page-rotation: 0deg))
+  table(
+    columns: 3,
+    stroke: (x: none, y: 0.5pt),
+    table.header[Test][Condition][Conclusion],
+    table.hline(stroke: 1pt),
+    [Ratio], [$ell < 1$], [converges],
+    [Root], [$limsup root(n, abs(u_n)) < 1$], [converges],
+    [Cauchy], [Cauchy sequence], [converges],
+  )
+  line(length: 100%, stroke: 1.2pt)
+  rect(width: 100%, inset: 6pt)[*Remark.* Each test is inconclusive when the limit equals 1.]
 } else {
   panic("unknown figure " + repr(fig))
 }

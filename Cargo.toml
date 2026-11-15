@@ -1,15 +1,15 @@
 [package]
 name = "lookscanned"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "Apache-2.0"
-description = "Typst plugin generating seeded scan textures (paper, grain, stains, dust, edges)."
+description = "A Typst package to make documents look scanned, photocopied, faxed or typewritten, powered by WASM."
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [profile.release]
-opt-level = "z"
+opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"

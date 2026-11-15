@@ -1,5 +1,4 @@
-//! Paper background: base colour, low-frequency mottling, yellowing and foxing.
-//! Smooth by nature, so Typst asks for it at a fraction of the page resolution.
+//! Paper background: colour, mottling, yellowing and foxing.
 
 use crate::encode::Img;
 use crate::params::Params;
@@ -10,7 +9,7 @@ const FOX: [f64; 3] = [0.62, 0.45, 0.28];
 
 pub fn paper(p: &Params) -> Img {
     let (w, h, seed) = (p.px("w", 64), p.px("h", 64), p.seed());
-    let mm = 1.0 / p.num("ppmm", 1.0); // mm per pixel
+    let mm = 1.0 / p.num("ppmm", 1.0);
     let base = p.color("color", [1.0; 3]);
     let grain = p.num("grain", 0.0);
     let aging = p.num("aging", 0.0);
@@ -36,7 +35,6 @@ pub fn paper(p: &Params) -> Img {
         }
     }
 
-    // Foxing: small rusty spots, more with age.
     let mut rng = Rng::new(seed ^ 3);
     let area = (w as f64 * mm) * (h as f64 * mm) / (210.0 * 297.0);
     for _ in 0..(aging * aging * 60.0 * area) as usize {

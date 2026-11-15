@@ -1,10 +1,11 @@
-// Every theme with its neutral value (no effect). Presets and user settings
-// are merged on top of this; it also defines the accepted keys and types.
+// Themes and presets.
+
+// Neutral values, and the accepted keys and types.
 #let base = (
   paper: (
     color: white,
     grain: 0,
-    aging: 0, // yellowing, foxing
+    aging: 0,
     fibers: 0,
   ),
   stains: (
@@ -18,25 +19,30 @@
     bleed: 0,
     fade: 0,
     legibility: 1, // 1 = sharp, 0 = barely readable
-    wear: 0, // toner dropouts / worn ribbon
-    ghosting: false, // offset copies; duplicates text for some extractors
+    wear: 0,
+    ghosting: false, // duplicates text in some extractors
   ),
   skew: (
-    page-rotation: 0deg, // maximum, drawn per page
-    line-jitter: 0deg, // rotation per block ("line") or per word ("word")
-    char-jitter: 0pt, // offset per word / char
-    drift: 0, // 0 = independent pages, 1 = slowly wandering angle
+    page-rotation: 0deg, // maximum per page
+    line-jitter: 0deg, // per block or per word
+    char-jitter: 0pt, // per word or per char
+    drift: 0, // 0 = independent pages
   ),
   edges: (
     shadow: 0,
     vignette: 0,
-    uneven: 0, // uneven lighting (phone photos)
+    uneven: 0,
     binding: false,
     punch-holes: false,
+    folds: 0, // horizontal creases, 2 = letter folded in three
+    dog-ear: false,
+    staple: false,
+    paperclip: false,
+    torn: false, // bottom edge
   ),
   scanner: (
-    lines: 0, // fax lines
-    bands: 0, // photocopier bands
+    lines: 0,
+    bands: 0,
   ),
   quality: (
     resolution: 150, // dpi
@@ -91,11 +97,34 @@
     skew: (page-rotation: 0.8deg, line-jitter: 0.1deg, drift: 0.4),
     edges: (shadow: 0.3, vignette: 0.5),
   ),
-  // No true perspective in Typst: slight skew and uneven light only.
   phone-scan: (
     paper: (color: rgb("#f4f2ec"), grain: 0.25),
     ink: (bleed: 0.2, fade: 0.1),
     skew: (page-rotation: 1.5deg, line-jitter: 0.1deg),
     edges: (shadow: 0.3, vignette: 0.6, uneven: 0.7),
+  ),
+  mimeograph: (
+    paper: (color: rgb("#f6f3ea"), grain: 0.45, aging: 0.1, fibers: 0.4),
+    stains: (dust: 0.2),
+    ink: (bleed: 0.85, fade: 0.6, legibility: 0.8, wear: 0.3),
+    skew: (page-rotation: 0.7deg, line-jitter: 0.08deg, drift: 0.6),
+    edges: (shadow: 0.2, punch-holes: true, folds: 2),
+    scanner: (bands: 0.3),
+  ),
+  microfilm: (
+    paper: (color: rgb("#dcdcd6"), grain: 0.6),
+    stains: (color: luma(40), amount: 0.05, dust: 0.6, scratches: 0.7),
+    ink: (bleed: 0.6, fade: 0.2, legibility: 0.75, wear: 0.25),
+    skew: (page-rotation: 1.2deg, line-jitter: 0.05deg, drift: 0.8),
+    edges: (shadow: 0.6, vignette: 0.8, uneven: 0.5),
+    scanner: (lines: 0.4),
+  ),
+  newsprint: (
+    paper: (color: rgb("#e9e1cc"), grain: 0.6, aging: 0.45, fibers: 0.7),
+    stains: (color: rgb("#9a7444"), amount: 0.2, dust: 0.3),
+    ink: (bleed: 0.65, fade: 0.25, legibility: 0.85, wear: 0.2),
+    skew: (page-rotation: 0.5deg, line-jitter: 0.08deg, drift: 0.4),
+    edges: (shadow: 0.3, vignette: 0.25, uneven: 0.2, folds: 1),
+    scanner: (bands: 0.2),
   ),
 )

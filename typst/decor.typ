@@ -1,42 +1,40 @@
-// Decorative elements: rubber stamp, stain, approximate handwriting.
+// Decorations: stamp, stain, scribble and highlight.
 #import "wasm.typ": random-table, texture
 #import "effects/jitter.typ": rnd
+#import "effects/page.typ": active, over-label
 
-// Places `body` at `at` (x, y relative to the container) or returns it inline.
+// Places `body` at (x, y), or inline.
 #let _at(at, body) = if at == none { body } else {
   assert(type(at) == dictionary and "x" in at and "y" in at, message: "lookscanned: at must be (x: .., y: ..), got " + repr(at))
   place(top + left, dx: at.x, dy: at.y, body)
 }
 
-/// Rubber stamp: framed capitals, unevenly inked, slightly rotated.
+/// Rubber stamp.
 #let stamp(body, color: rgb("#c0392b"), angle: -12deg, size: 16pt, seed: 0, at: none) = {
-  let label = text(size: size, weight: "bold", tracking: 0.12em, fill: color, upper(body))
+  let paint = tiling(size: (8mm, 8mm), texture("ink", seed: seed + 11, width: 8mm, height: 8mm, resolution: 600, mode: "fill", color: color, amount: 1.3))
+  let label = text(size: size, weight: "bold", tracking: 0.12em, fill: paint, upper(body))
   let frame = rect(
-    stroke: 2.4pt + color,
+    stroke: 2.4pt + paint,
     radius: 3pt,
     inset: 3pt,
-    rect(stroke: 0.8pt + color, radius: 2pt, inset: (x: 0.7em, y: 0.45em), label),
+    rect(stroke: 0.8pt + paint, radius: 2pt, inset: (x: 0.7em, y: 0.45em), label),
   )
-  let inked = context {
-    let s = measure(frame)
-    // Paper-coloured holes from the toner texture: patchy rubber ink.
-    box(width: s.width, height: s.height, {
-      frame
-      place(top + left, texture("toner", seed: seed, width: s.width, height: s.height, resolution: 200, amount: 0.9, color: white))
-    })
-  }
-  _at(at, rotate(angle, reflow: false, box(inked)))
+  _at(at, rotate(angle, reflow: false, box(frame)))
 }
 
-/// A single stain of `size` centred on `at` (or inline when `at` is none).
-#let stain(at: none, color: rgb("#6b4423"), size: 20mm, seed: 0) = {
+/// A stain centred on `at`. `over` paints it above the text; without `scan`, under it.
+#let stain(at: none, color: rgb("#6b4423"), size: 20mm, seed: 0, over: false) = {
   let s = size * 1.4
   let img = texture("stains", seed: seed, width: s, height: s, resolution: 120, color: color, count: 1, min: size, max: size)
-  if at == none { box(img) } else { _at((x: at.x - s / 2, y: at.y - s / 2), img) }
+  let out = if over { context if active.get() { box(width: s, height: s, [#metadata(img)#over-label]) } else { img } } else { img }
+  if at == none { 
+    box(out) 
+  } else { 
+    _at((x: at.x - s / 2, y: at.y - s / 2), out) 
+  }
 }
 
-/// Approximate handwriting. With a body: wobbly italic text. Without: a
-/// scrawl (signature, crossing out) of the given `width`.
+/// Fake handwriting, or a scrawl without `body`.
 #let scribble(body: none, color: blue, width: 4cm, seed: 0, angle: -3deg, at: none) = {
   let t = random-table(seed)
   assert(body == none or type(body) == str, message: "lookscanned.scribble: body must be a string")
@@ -57,4 +55,56 @@
     ))
   }
   _at(at, rotate(angle, reflow: false, box(out)))
+}
+
+#let _hl-count = counter("lookscanned-highlight")
+
+#let _hl-key(p) = str(p.page) + ":" + str(p.x.pt()) + ":" + str(p.y.pt())
+
+// Right edge of each line, keyed by its first word. Memoised by Typst.
+#let _hl-lines(words) = {
+  let out = (:)
+  let (key, prev) = (none, none)
+  for m in words {
+    let p = m.location().position()
+    let (w, h) = (m.value.width, m.value.height)
+    let apart = prev == none or p.page != prev.page or p.x < prev.x - 0.1pt or p.y >= prev.bottom or p.y + h <= prev.top
+    if apart { key = _hl-key(p) }
+    prev = (page: p.page, x: p.x + w, top: p.y, bottom: p.y + h)
+    out.insert(key, prev.x)
+  }
+  out
+}
+
+// One stroke per line, drawn from its first word.
+#let _hl-stroke(id, t, seed, color, opacity, words) = context {
+  let me = here().position()
+  let right = _hl-lines(query(words)).at(_hl-key(me), default: none)
+  if right == none { return }
+  let k = int(me.y.pt()) + 1000 * me.page
+  let r(n) = rnd(t, id, k, n)
+  let em = 1em.to-absolute()
+  let thick = (1.05 + 0.08 * r(1)) * em
+  let h = thick / 0.8
+  let centre = (0.3 + 0.05 * r(2)) * em
+  let (before, after) = ((0.12 + 0.18 * r(3)) * em, (0.12 + 0.2 * r(4)) * em)
+  let width = right - me.x + before + after
+  let img = texture("marker", seed: seed * 7919 + id * 101 + k, width: width, height: h, resolution: 200, color: color, opacity: opacity)
+  place(top + left, dx: -before, dy: measure[H].height - centre - h / 2, rotate(0.6deg * r(5), reflow: false, img))
+}
+
+/// Highlighter strokes under `body`, one per line; the text stays text.
+#let highlighter(body, color: rgb("#ffe94d"), opacity: 0.55, seed: 0) = {
+  _hl-count.step()
+  context {
+    let id = _hl-count.get().first()
+    let t = random-table(seed)
+    let words = label("lookscanned-hl-" + str(id))
+    show regex("\\S+"): w => box({
+      _hl-stroke(id, t, seed, color, opacity, words)
+      context [#metadata(measure(w))#words]
+      w
+    })
+    body
+  }
 }

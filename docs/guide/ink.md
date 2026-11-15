@@ -1,6 +1,6 @@
 # Ink
 
-The `ink` theme controls the appearance of the glyphs: how far the ink spreads, how evenly it was applied and how much is missing. Ink effects modify the paint of the text, never the text itself (see [Architecture](../internals/architecture.md#ink)).
+The `ink` theme changes how glyphs are painted, never the glyphs themselves: text stays selectable and the layout does not move.
 
 ```typst
 #show: lookscanned.scan.with(
@@ -9,46 +9,50 @@ The `ink` theme controls the appearance of the glyphs: how far the ink spreads, 
 )
 ```
 
-The figures below use `clean-scan` with a single setting changed. Ink details are fine-grained: zoom in to see them.
+Figures below: `clean-scan`, one key changed. Zoom in for details.
 
 ## `bleed`
 
-Ink spreading into the paper. Each glyph is stroked with a patchy texture, so it grows by different amounts at different places. Around `0.3` the result resembles an ordinary print; above `1` the text becomes heavy and smudged.
+Ink spreading into the paper; glyphs grow unevenly. `0.3` looks like ordinary print, above `1` the text gets heavy and smudged.
 
 ![bleed 0, 0.4, 0.8, 1.2](../assets/img/ink-bleed.png)
 
 ## `fade`
 
-Uneven inking. Each word (each character with `quality.granularity: "char"`) is mixed with the paper colour by a random amount up to `fade`. The variation is quantised to three levels to limit the number of distinct textures in the PDF.
+Uneven inking: each word (each character with `granularity: "char"`) is lightened towards the paper colour by a random amount up to `fade`.
 
 ![fade 0, 0.4, 0.8](../assets/img/ink-fade.png)
 
 ## `wear`
 
-Pinholes and dropouts inside the glyphs: worn ribbon, dry toner, tired stamp pad. Values up to `1.5` are meaningful.
+Pinholes and dropouts inside glyphs: worn ribbon, dry toner. Meaningful up to `1.5`.
 
 ![wear 0, 0.5, 1](../assets/img/ink-wear.png)
 
 ## `legibility`
 
-A single control from `1` (sharp) to `0` (barely readable). Lowering it softens the glyph outline into a halo, adds dropouts and fades the ink. It is the quickest way to degrade a document without tuning each key.
+One control from `1` (sharp) to `0` (barely readable): softens the outline into a halo, adds dropouts, fades. The quickest way to degrade a document.
 
 ![legibility 1, 0.7, 0.4](../assets/img/ink-legibility.png)
 
-!!! note
-
-    The halo is narrower than a screen pixel at normal zoom. It is visible in print and when zooming in.
-
 ## `ghosting`
 
-`ghosting: true` draws three faint offset copies of each word, as on a blurred fax. The copies are tagged as PDF artifacts, but many tools (copy and paste, search, `pdftotext`) still extract them, so the option is off by default. Enable it only when the text does not need to be extracted.
+`true` adds three faint offset copies of each word, like a blurred fax. Off by default: the copies are tagged as PDF artifacts but most extractors (copy-paste, search, `pdftotext`) still pick them up.
 
 ```typst
 #show: lookscanned.scan.with(preset: "fax", ink: (ghosting: true))
 ```
 
+## Lines, rectangles and tables
+
+Strokes of `line`, `rect` and `table` (including `table.hline`, `table.vline` and cell strokes) get the same ink: faded, thickened by `bleed`, with dropouts.
+
+![A table, a rule and a framed remark under photocopy](../assets/img/strokes.png)
+
+`scan` rebuilds these elements to ink them, so your own `show line`/`show rect`/`show table` rules run twice. See [Limitations](../internals.md#show-rules-on-strokes).
+
 ## Scope
 
-- Ink applies to every text run and to every equation (see [Mathematics](mathematics.md)).
-- Text filled with a gradient or a tiling is left untouched.
-- Some PDF viewers draw the textured outline as plain ink; see [Limitations](../internals/limitations.md#pdf-viewers).
+- Every text run and every equation is inked ([Mathematics](mathematics.md)).
+- Text or strokes painted with a gradient or a tiling are left untouched.
+- Some PDF viewers draw the textured outline as plain ink ([Limitations](../internals.md#pdf-viewers)).

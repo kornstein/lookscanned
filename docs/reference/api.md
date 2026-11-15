@@ -1,38 +1,33 @@
 # API
 
 ```typst
-#import "@preview/lookscanned:0.1.0"
+#import "@preview/lookscanned:0.2.0"
 ```
 
-The import binds the module `lookscanned`. Every function below is called through it, for example `lookscanned.scan`.
+| Name | Purpose |
+|---|---|
+| [`scan`](#scan) | Show rule: the effect on the whole document |
+| [`page`](#page) | Override page effects on some pages |
+| [`region`](#region) | Text effects on one block |
+| [`derive`](#derive) | A preset with some settings changed |
+| [`presets`](#presets) | Built-in presets (dictionary) |
+| [`stamp`](#stamp), [`scribble`](#scribble), [`stain`](#stain), [`highlighter`](#highlighter) | Decorations |
+| [`texture`](#texture) | A raw texture image |
 
-| Name | Kind | Purpose |
-|---|---|---|
-| [`scan`](#scan) | show rule | Apply the effect to the whole document |
-| [`page`](#page) | function | Override page-level settings for some pages |
-| [`region`](#region) | function | Apply text effects to one block |
-| [`stamp`](#stamp) | function | Rubber stamp |
-| [`scribble`](#scribble) | function | Approximate handwriting or scrawl |
-| [`stain`](#stain) | function | One stain |
-| [`texture`](#texture) | function | A raw texture image |
-| [`presets`](#presets) | dictionary | Built-in presets |
-
-Names starting with `_` are internal and may change without notice.
+Names starting with `_` are internal.
 
 ## Common arguments
 
-`scan`, `page` and `region` take the same named arguments:
+`scan`, `page` and `region` take the same named arguments.
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
-| `preset` | `str` or `dictionary` | `"office-scan"` | Name of a [built-in preset](presets.md), or a dictionary of themes merged on neutral values. |
-| `intensity` | `int` or `float` ≥ 0 | `1` | Multiplier applied to the preset and themes. See [intensity](themes.md#intensity). |
-| `seed` | `int` | `0` | Selects the random variant. Same seed, same result. |
-| `paper`, `stains`, `ink`, `skew`, `edges`, `scanner`, `quality` | `dictionary` | from the preset | Theme overrides. See [Themes](themes.md). |
+| `preset` | `str` or `dictionary` | `"office-scan"` | A [preset name](presets.md), or a dictionary of themes merged on the neutral values. |
+| `intensity` | number ≥ 0 | `1` | Scales the effects. See [Intensity](themes.md#intensity). |
+| `seed` | `int` | `0` | Random variant. Same seed, same output. |
+| `paper`, `stains`, `ink`, `skew`, `edges`, `scanner`, `quality` | `dictionary` or `none` | from the preset | [Theme](themes.md) overrides. `none` resets a theme or a key to neutral. |
 
-For `page`, unset arguments are inherited from `scan` instead of these defaults.
-
-Positional arguments other than the body, unknown themes, unknown keys and values of the wrong type stop compilation with an error that names the problem.
+With `page`, unset arguments come from `scan`. Positional arguments other than the body, unknown themes or keys, and wrong types or ranges stop compilation with an error.
 
 ## `scan`
 
@@ -40,14 +35,13 @@ Positional arguments other than the body, unknown themes, unknown keys and value
 #show: lookscanned.scan.with(..arguments)
 ```
 
-Applies the effects to everything that follows. It:
+Applies to everything after it:
 
-- sets the page `background` (paper, grain, stains) and `foreground` (scanner lines and bands, dust, lighting, punch holes), replacing any you set before;
-- rotates and moves paragraphs, headings, lists, enumerations, term lists, figures, block equations and code blocks so that each page looks rotated;
-- applies ink effects, and word or character jitter, to every text run;
-- applies ink effects to every equation as a whole (see [Mathematics](../guide/mathematics.md#equations)).
+- sets the page `background` and `foreground`, replacing earlier ones;
+- rotates paragraphs, headings, lists, enumerations, term lists, figures, block equations and code blocks so each page looks rotated;
+- inks every text run, equation, and the strokes of `line`, `rect` and `table`; jitters words or characters.
 
-Place it after your `set page` rules, and before a template rule that must come last.
+Place it after `set page`, and before a template rule that must come last.
 
 ## `page`
 
@@ -55,7 +49,7 @@ Place it after your `set page` rules, and before a template rule that must come 
 #lookscanned.page(..arguments)[body]
 ```
 
-Overrides the page-level effects for every page that `body` spans: paper, stains, dust, lighting, scanner artefacts and page rotation. Ink and text jitter stay those of `scan`. It inserts no page break. It cannot be nested. Requires `scan`.
+Overrides page effects (paper, stains, lighting, damage, scanner, page rotation) on every page `body` spans. Ink and text jitter keep the `scan` settings. No page break, no nesting. Requires `scan`.
 
 ## `region`
 
@@ -63,7 +57,35 @@ Overrides the page-level effects for every page that `body` spans: paper, stains
 #lookscanned.region(..arguments)[body]
 ```
 
-Returns a full-width block filled with the paper colour and grain, slightly rotated, whose text and equations get the ink and jitter effects. It needs no `scan`. Avoid it inside a `scan` document: text effects would apply twice.
+A full-width block filled with the paper colour and grain, slightly rotated, whose text, equations and strokes are inked and jittered. Use without `scan`.
+
+## `derive`
+
+```typst
+#lookscanned.derive(preset, ..themes)
+```
+
+| Argument | Type | Description |
+|---|---|---|
+| `preset` | `str` or `dictionary` | Base preset. |
+| `..themes` | `dictionary` or `none` | Overrides, as in `scan`. Omitted keys keep the preset's value; `none` resets to neutral. |
+
+Returns a preset dictionary.
+
+```typst
+#let soft-fax = lookscanned.derive("fax", ink: (bleed: 0.2))
+#show: lookscanned.scan.with(preset: soft-fax)
+```
+
+## `presets`
+
+Dictionary of the built-in presets. Each lists only the keys that differ from neutral.
+
+```typst
+#lookscanned.presets.keys()
+// ("clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper",
+//  "phone-scan", "mimeograph", "microfilm", "newsprint")
+```
 
 ## `stamp`
 
@@ -73,12 +95,12 @@ Returns a full-width block filled with the paper colour and grain, slightly rota
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
-| `body` | `content` or `str` | required | Text of the stamp, set in bold capitals. |
+| `body` | `content` or `str` | required | Text, set in bold capitals. |
 | `color` | `color` | `rgb("#c0392b")` | Ink colour. |
 | `angle` | `angle` | `-12deg` | Rotation. |
 | `size` | `length` | `16pt` | Text size. |
 | `seed` | `int` | `0` | Ink pattern. |
-| `at` | `dictionary` or `none` | `none` | `(x: .., y: ..)` position of the top-left corner, relative to the container. `none` inserts it inline. |
+| `at` | `(x, y)` or `none` | `none` | Top-left corner, relative to the container. `none`: inline. |
 
 ## `scribble`
 
@@ -88,25 +110,39 @@ Returns a full-width block filled with the paper colour and grain, slightly rota
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
-| `body` | `str` or `none` | `none` | Text written in a wobbly italic. With `none`, a scrawl is drawn instead. |
+| `body` | `str` or `none` | `none` | Text in a wobbly italic. `none`: a scrawl. |
 | `color` | `color` | `blue` | Ink colour. |
-| `width` | `length` | `4cm` | Width of the scrawl (ignored with a `body`). |
+| `width` | `length` | `4cm` | Scrawl width (ignored with `body`). |
 | `seed` | `int` | `0` | Shape variant. |
 | `angle` | `angle` | `-3deg` | Rotation. |
-| `at` | `dictionary` or `none` | `none` | `(x: .., y: ..)` position of the top-left corner. |
+| `at` | `(x, y)` or `none` | `none` | Top-left corner. |
 
 ## `stain`
 
 ```typst
-#lookscanned.stain(at: none, color: rgb("#6b4423"), size: 20mm, seed: 0)
+#lookscanned.stain(at: none, color: rgb("#6b4423"), size: 20mm, seed: 0, over: false)
 ```
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
-| `at` | `dictionary` or `none` | `none` | `(x: .., y: ..)` position of the **centre**. `none` inserts it inline. |
-| `color` | `color` | `rgb("#6b4423")` | Stain colour. |
+| `at` | `(x, y)` or `none` | `none` | **Centre** of the stain. `none`: inline. |
+| `color` | `color` | `rgb("#6b4423")` | Colour. |
 | `size` | `length` | `20mm` | Diameter. |
-| `seed` | `int` | `0` | Shape variant: blotch, ring or splatter. |
+| `seed` | `int` | `0` | Blotch, ring or splatter. |
+| `over` | `bool` | `false` | Paint above the text. Only inside `scan`. |
+
+## `highlighter`
+
+```typst
+#lookscanned.highlighter(body, color: rgb("#ffe94d"), opacity: 0.55, seed: 0)
+```
+
+| Argument | Type | Default | Description |
+|---|---|---|---|
+| `body` | `content` | required | Highlighted content. Stays text; may span lines; no hyphenation. |
+| `color` | `color` | `rgb("#ffe94d")` | Marker colour. |
+| `opacity` | number in [0, 1] | `0.55` | Ink density. |
+| `seed` | `int` | `0` | Shape of the strokes. |
 
 ## `texture`
 
@@ -116,19 +152,10 @@ Returns a full-width block filled with the paper colour and grain, slightly rota
 
 | Argument | Type | Default | Description |
 |---|---|---|---|
-| `kind` | `str` | required | One of the [texture kinds](textures.md). |
+| `kind` | `str` | required | A [texture kind](textures.md). |
 | `seed` | `int` | `0` | Variant. |
-| `width`, `height` | `length` or `auto` | `auto` | Size of the image. `auto` uses the page size and requires a fixed page height. |
+| `width`, `height` | `length` or `auto` | `auto` | Image size. `auto`: page size (needs a fixed page height). |
 | `resolution` | number | `150` | DPI. Some kinds use a fraction of it. |
-| `..parameters` | named | | Kind-specific parameters. Lengths are converted to pixels. |
+| `..parameters` | named | | Kind-specific. Lengths are converted to pixels. |
 
 Returns an `image`.
-
-## `presets`
-
-A dictionary mapping each preset name to its themes. Presets only list the keys that differ from the neutral values. See [Presets](presets.md).
-
-```typst
-#lookscanned.presets.keys()
-// ("clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper", "phone-scan")
-```

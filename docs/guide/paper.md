@@ -1,6 +1,10 @@
-# Paper and scanner
+# Paper and page effects
 
-Four themes describe what surrounds the text: `paper` (the sheet), `stains` (marks on the sheet and on the scanner glass), `edges` (lighting) and `scanner` (transfer artefacts). They are drawn as page background and foreground images.
+Four themes act on the sheet rather than the text: `paper`, `stains`, `edges` and `scanner`. They are drawn as page background and foreground images. Every key is listed in the [Themes reference](../reference/themes.md).
+
+!!! note "Fixed page height"
+
+    Page-sized images need the page height. With `#set page(height: auto)`, only the paper colour and the tiled grain are drawn.
 
 ## Paper
 
@@ -13,37 +17,31 @@ Four themes describe what surrounds the text: `paper` (the sheet), `stains` (mar
 
 | Key | Effect |
 |---|---|
-| `color` | Base colour of the sheet. Also used as the target colour of ink fading. |
-| `grain` | Fine noise and low-frequency mottling. |
-| `aging` | Yellowing, stronger towards the edges, and foxing (small rust-coloured spots, quadratic in `aging`). |
+| `color` | Sheet colour. Faded ink also tends towards it. |
+| `grain` | Fine noise and mottling. |
+| `aging` | Yellowing towards the edges, and foxing spots. |
 | `fibers` | Short paper fibres. |
 
 ![aging 0, 0.3, 0.6, 1](../assets/img/paper-aging.png)
 
-## Stains, dust and scratches
+## Stains, dust, scratches
 
 ```typst
 #show: lookscanned.scan.with(
   preset: "office-scan",
-  stains: (
-    color: rgb("#8b5a2b"),
-    amount: 0.4,
-    size: (min: 5mm, max: 25mm),
-    dust: 0.6,
-    scratches: 0.3,
-  ),
+  stains: (color: rgb("#8b5a2b"), amount: 0.4, size: (min: 5mm, max: 25mm), dust: 0.6, scratches: 0.3),
 )
 ```
 
 | Key | Effect |
 |---|---|
-| `amount` | Density of stains per page, scaled by page area relative to A4. Each stain is a blotch, a ring or a splatter. |
-| `color` | Stain colour: brown for coffee, grey for toner, blue for ink. |
+| `amount` | Stains per page (blotches, rings, splatters), scaled to page area. |
+| `color` | Brown for coffee, grey for toner, blue for ink. |
 | `size` | Range of diameters. |
-| `dust` | Specks and hairs on the glass, drawn above the text. |
+| `dust` | Specks and hairs on the glass, above the text. |
 | `scratches` | Long faint lines, mostly vertical. |
 
-To place a single stain at a given position, use [`stain`](decorations.md#stain).
+For one stain at a given spot, use [`stain`](decorations.md#stain).
 
 ## Lighting
 
@@ -56,13 +54,34 @@ To place a single stain at a given position, use [`stain`](decorations.md#stain)
 
 | Key | Effect |
 |---|---|
-| `shadow` | Dark borders where the sheet does not lie flat. One side, chosen from the seed, dominates. |
+| `shadow` | Dark borders, one side dominant. |
 | `vignette` | Darker corners. |
-| `uneven` | Light falling off from one side, as in a phone photograph. |
-| `binding` | Gutter shadow along the left edge of a bound volume. |
-| `punch-holes` | Two filing holes on the left edge (ISO 838: 6 mm, 80 mm apart, centred 12 mm from the edge). |
+| `uneven` | Light falling off from one side, as in a phone photo. |
+| `binding` | Gutter shadow on the left, as in a bound volume. |
+| `punch-holes` | Two filing holes on the left (ISO 838). |
 
-## Scanner artefacts
+## Damage
+
+```typst
+#show: lookscanned.scan.with(
+  preset: "old-paper",
+  edges: (folds: 1, dog-ear: true, staple: true, paperclip: true, torn: true),
+)
+```
+
+![Fold, dog-ear, staple, paperclip and torn edge](../assets/img/damage.png)
+
+| Key | Effect |
+|---|---|
+| `folds` | Number of horizontal creases. `2` for a letter folded in three. |
+| `dog-ear` | Top-right corner folded over. |
+| `staple` | Staple in the top-left corner. |
+| `paperclip` | Rust marks of a paperclip on the top edge. |
+| `torn` | Bottom edge torn off. |
+
+The dog-ear and the torn edge hide the text beneath them: keep wide enough margins.
+
+## Scanner
 
 ```typst
 #show: lookscanned.scan.with(preset: "office-scan", scanner: (lines: 0.5, bands: 0.4))
@@ -70,9 +89,5 @@ To place a single stain at a given position, use [`stain`](decorations.md#stain)
 
 | Key | Effect |
 |---|---|
-| `lines` | Fax transmission: thin horizontal dark lines and white dropouts. |
-| `bands` | Photocopier: soft vertical bands and a few drum streaks. |
-
-## Pages without a fixed height
-
-Page-sized textures need the page height. With `#set page(height: auto)`, only the paper colour and the tiled grain are drawn; mottling, ageing, stains, dust, lighting and scanner artefacts are skipped.
+| `lines` | Fax: thin horizontal lines and white dropouts. |
+| `bands` | Photocopier: soft vertical bands and drum streaks. |

@@ -1,15 +1,15 @@
+// WebAssembly plugin.
 #let _plugin = plugin("lookscanned.wasm")
 
-#let _kinds = ("paper", "grain", "toner", "ink", "stains", "dust", "lines", "edges")
+#let _kinds = ("paper", "grain", "toner", "ink", "stains", "dust", "lines", "edges", "damage", "marker")
 
-// Resolution factor per kind: smooth textures are rendered coarser.
-#let _factor = (paper: 1 / 8, stains: 1 / 3, edges: 1 / 10)
+// Smooth textures use a lower resolution.
+#let _factor = (paper: 1 / 8, stains: 1 / 3, edges: 1 / 10, damage: 1 / 2)
 
-// `TABLE_LEN` random bytes, read through `rnd` in effects/jitter.typ.
+// Random bytes, read with `rnd`.
 #let random-table(seed) = _plugin.random(cbor.encode(seed))
 
-// Raw PNG bytes of a texture. `w`/`h` in pixels; colours and pixel lengths
-// are converted here, everything else is passed as is (see src/params.rs).
+// PNG bytes of a texture, sizes in pixels.
 #let texture-bytes(kind, ..args) = {
   let p = args.named()
   for (k, v) in p {
@@ -20,20 +20,20 @@
   _plugin.texture(bytes(kind), cbor.encode(p))
 }
 
-/// Generates a texture as an image sized to `width` × `height` (the page by default).
+/// Generates a texture as an image, page-sized by default.
 ///
-/// - kind: "paper", "grain", "toner", "ink", "stains", "dust", "lines" or "edges".
+/// - kind: one of `_kinds`.
 /// - seed: same seed, same texture.
-/// - resolution: dpi of the generated image (smooth kinds use a fraction of it).
-/// - ..args: texture parameters (`color`, `amount`, `grain`, `aging`, `min`, `max`…).
-///   Lengths are converted to pixels.
+/// - resolution: dpi of the image.
+/// - ..args: texture parameters.
 #let texture(kind, seed: 0, width: auto, height: auto, resolution: 150, ..args) = {
   assert(kind in _kinds, message: "lookscanned.texture: unknown kind " + repr(kind) + ", expected one of " + _kinds.map(repr).join(", "))
   assert(type(seed) == int, message: "lookscanned.texture: seed must be an integer")
   assert(args.pos().len() == 0, message: "lookscanned.texture: unexpected positional arguments")
   context {
-    let w = if width == auto { page.width } else { width }
-    let h = if height == auto { page.height } else { height }
+    let (pw, ph) = if page.flipped { (page.height, page.width) } else { (page.width, page.height) }
+    let w = if width == auto { pw } else { width }
+    let h = if height == auto { ph } else { height }
     assert(type(w) == length and type(h) == length, message: "lookscanned.texture: width and height must be lengths (page height is auto?)")
     let w = w.to-absolute()
     let h = h.to-absolute()

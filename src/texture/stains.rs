@@ -1,4 +1,4 @@
-//! Stains in a user-chosen colour: blotches, coffee rings and splatters.
+//! Stains: blotches, rings and splatters.
 
 use std::f64::consts::TAU;
 
@@ -6,6 +6,7 @@ use crate::encode::Img;
 use crate::params::Params;
 use crate::rng::{Rng, fbm, smoothstep};
 
+/// `count` places that many stains at the centre.
 pub fn stains(p: &Params) -> Img {
     let (w, h, seed) = (p.px("w", 64), p.px("h", 64), p.seed());
     let ppmm = p.num("ppmm", 2.0);
@@ -14,7 +15,6 @@ pub fn stains(p: &Params) -> Img {
     let mut img = Img::new(w, h, 4);
     let mut rng = Rng::new(seed);
 
-    // `count` places that many stains centred in the image (used by `stain()`).
     let single = p.num("count", 0.0) as usize;
     let area = (w as f64 / ppmm) * (h as f64 / ppmm) / (210.0 * 297.0);
     let n = if single > 0 { single } else { (amount * 9.0 * area + rng.f()) as usize };
@@ -49,7 +49,7 @@ pub fn stains(p: &Params) -> Img {
     img
 }
 
-/// Irregular disc with a darker rim (the dried edge of a liquid stain).
+/// Irregular disc with a darker rim.
 fn blotch(img: &mut Img, cx: f64, cy: f64, r: f64, strength: f64, seed: u64) {
     paint(img, cx, cy, r, seed, |d, n| {
         let inside = 1.0 - smoothstep(0.92, 1.04, d);
@@ -57,7 +57,7 @@ fn blotch(img: &mut Img, cx: f64, cy: f64, r: f64, strength: f64, seed: u64) {
     });
 }
 
-/// Coffee-cup ring, often broken.
+/// Coffee ring, often broken.
 fn ring(img: &mut Img, cx: f64, cy: f64, r: f64, strength: f64, seed: u64) {
     paint(img, cx, cy, r, seed, |d, n| {
         let band = smoothstep(0.82, 0.95, d) * (1.0 - smoothstep(0.97, 1.03, d));
@@ -65,7 +65,7 @@ fn ring(img: &mut Img, cx: f64, cy: f64, r: f64, strength: f64, seed: u64) {
     });
 }
 
-/// Calls `f(distorted distance, noise)` over the stain's bounding box.
+/// Calls `f(distance, noise)` over the stain's box.
 fn paint(img: &mut Img, cx: f64, cy: f64, r: f64, seed: u64, f: impl Fn(f64, f64) -> f64) {
     let r = r.max(1.0);
     let x0 = (cx - r * 1.4).max(0.0) as i64;
@@ -75,7 +75,6 @@ fn paint(img: &mut Img, cx: f64, cy: f64, r: f64, seed: u64, f: impl Fn(f64, f64
     for y in y0..=y1 {
         for x in x0..=x1 {
             let (dx, dy) = ((x as f64 - cx) / r, (y as f64 - cy) / r);
-            // Distort the outline by angle so stains are not circles.
             let a = dy.atan2(dx);
             let wobble = fbm(seed, a.cos() * 1.5 + 9.0, a.sin() * 1.5 + 9.0, 3) - 0.5;
             let d = (dx * dx + dy * dy).sqrt() * (1.0 + wobble * 0.45);

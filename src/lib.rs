@@ -1,24 +1,25 @@
+//! WebAssembly plugin: textures and random table.
+
 mod encode;
 mod jitter;
 mod params;
 mod rng;
 mod texture;
 
-/// `texture(kind, params)`: `kind` is a UTF-8 name, `params` a CBOR map
-/// (see `params.rs`). Returns PNG bytes.
+/// Renders a texture as PNG bytes. `params` is a CBOR map.
 pub fn texture(kind: &[u8], params: &[u8]) -> Result<Vec<u8>, String> {
     let kind = std::str::from_utf8(kind).map_err(|e| e.to_string())?;
     let params = params::Params::decode(params)?;
     Ok(texture::render(kind, &params)?.png())
 }
 
-/// `random(seed)`: `seed` as CBOR integer. Returns `jitter::TABLE_LEN` bytes.
+/// Random table for a CBOR integer seed.
 pub fn random(seed: &[u8]) -> Result<Vec<u8>, String> {
     let seed = minicbor::decode::<i64>(seed).map_err(|e| e.to_string())?;
     Ok(jitter::table(seed as u64))
 }
 
-// The protocol imports only link inside a WASM host; keep native `cargo test` working.
+// The protocol imports only link in a WASM host.
 #[cfg(target_arch = "wasm32")]
 mod plugin {
     use wasm_minimal_protocol::*;
@@ -52,7 +53,7 @@ mod tests {
     #[test]
     fn every_kind_renders_deterministically() {
         let p = params(&[("w", 40.0), ("h", 30.0), ("ppmm", 2.0), ("seed", 7.0), ("amount", 0.8)]);
-        for kind in ["paper", "grain", "toner", "ink", "stains", "dust", "lines", "edges"] {
+        for kind in ["paper", "grain", "toner", "ink", "stains", "dust", "lines", "edges", "damage", "marker"] {
             let a = super::texture(kind.as_bytes(), &p).unwrap();
             assert_eq!(a, super::texture(kind.as_bytes(), &p).unwrap(), "{kind}");
         }

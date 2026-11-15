@@ -1,6 +1,6 @@
-//! Seeded randomness: everything visible derives from the user seed.
+//! Seeded randomness.
 
-/// SplitMix64: tiny, fast, good enough for visual noise.
+/// SplitMix64.
 pub struct Rng(u64);
 
 impl Rng {
@@ -28,7 +28,7 @@ impl Rng {
     }
 }
 
-/// SplitMix64 finalizer, used as a stateless hash.
+/// SplitMix64 finalizer.
 pub fn mix(mut z: u64) -> u64 {
     z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
     z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
@@ -45,7 +45,7 @@ fn smooth(t: f64) -> f64 {
     t * t * (3.0 - 2.0 * t)
 }
 
-/// Value noise in [0, 1). `period` > 0 wraps the lattice so the result tiles.
+/// Value noise in [0, 1). `period` > 0 makes it tile.
 pub fn vnoise(seed: u64, x: f64, y: f64, period: i64) -> f64 {
     let (x0, y0) = (x.floor(), y.floor());
     let (tx, ty) = (smooth(x - x0), smooth(y - y0));
@@ -57,7 +57,7 @@ pub fn vnoise(seed: u64, x: f64, y: f64, period: i64) -> f64 {
     a + (b - a) * ty
 }
 
-/// Fractal value noise in [0, 1), `octaves` layers halving in amplitude.
+/// Fractal value noise in [0, 1).
 pub fn fbm(seed: u64, x: f64, y: f64, octaves: u32) -> f64 {
     let (mut sum, mut amp, mut norm, mut f) = (0.0, 1.0, 0.0, 1.0);
     for o in 0..octaves {
@@ -69,8 +69,7 @@ pub fn fbm(seed: u64, x: f64, y: f64, octaves: u32) -> f64 {
     sum / norm
 }
 
-/// Tileable fractal noise in [0, 1): `x`, `y` in units of the base lattice,
-/// which wraps every `period` cells (each octave doubles both).
+/// Tileable fractal noise in [0, 1).
 pub fn pfbm(seed: u64, x: f64, y: f64, period: i64, octaves: u32) -> f64 {
     let (mut sum, mut amp, mut norm, mut f) = (0.0, 1.0, 0.0, 1i64);
     for o in 0..octaves {
@@ -103,7 +102,6 @@ mod tests {
             let n = fbm(7, i as f64 * 0.37, i as f64 * 0.11, 4);
             assert!((0.0..1.0).contains(&n));
         }
-        // Periodic noise tiles.
         assert_eq!(vnoise(3, 0.25, 0.5, 8), vnoise(3, 8.25, 0.5, 8));
         assert!((pfbm(3, 0.25, 0.5, 8, 3) - pfbm(3, 8.25, 0.5, 8, 3)).abs() < 1e-12);
     }
