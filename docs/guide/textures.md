@@ -2,7 +2,7 @@
 
 Textures are generated at compile time by the WebAssembly plugin and embedded as images. Plugins run in an interpreter, so texture generation dominates compile time.
 
-## The `quality` theme
+## Cost
 
 ```typst
 #show: lookscanned.scan.with(
@@ -15,16 +15,16 @@ Textures are generated at compile time by the WebAssembly plugin and embedded as
 |---|---|---|
 | `resolution` | `150` | Texture DPI. Cost grows with its square: `100` is about 45 % of `150`. |
 | `tile` | `true` | One 40 mm grain tile shared by every page. `false`: a full-page grain per page, much heavier. |
-| `granularity` | `"line"` | What jitters. See below. |
+| `granularity` | `"line"` | What jitters; see the table below. |
 
-| `granularity` | Moves | Cost |
+| `granularity` | What jitters | Cost |
 |---|---|---|
 | `"page"` | Page rotation only | lowest |
-| `"line"` | Each block: paragraph, heading, list, figure, block equation, code block | low |
-| `"word"` | Each word; prevents hyphenation | higher |
-| `"char"` | Each character, vertically | highest |
+| `"line"` | Page rotation, plus a rotation per block | low |
+| `"word"` | Page rotation, plus each word; prevents hyphenation | higher |
+| `"char"` | Page rotation, plus each character, vertically | highest |
 
-Each texture kind uses a fraction of `resolution` suited to its detail: `paper` 1/8, `edges` 1/10, `stains` 1/3, `damage` 1/2, ink 4×, others 1×.
+Each texture kind uses a fraction of `resolution` suited to its detail: `paper` 1/8, `edges` 1/10, `stains` 1/3, `damage` 1/2, the others 1×. The ink paint for text is an exception: `ink` asks `resolution × 4`.
 
 Typst memoises plugin calls, so identical textures are generated once. Ink fading is quantised to three levels to keep the number of distinct ink tiles low.
 
@@ -41,7 +41,7 @@ Typst memoises plugin calls, so identical textures are generated once. Ink fadin
 #lookscanned.texture("stains", width: 4cm, height: 4cm, count: 1, min: 25mm, max: 30mm)
 ```
 
-Without `width` and `height`, the image takes the page size (needs a fixed page height).
+Without `width` and `height`, the image takes the page size, which needs a fixed page height.
 
 `grain`, `toner` and `ink` tile seamlessly:
 
@@ -55,7 +55,7 @@ Without `width` and `height`, the image takes the page size (needs a fixed page 
 ```typst
 #set page(background: {
   place(lookscanned.texture("paper", seed: 1, color: rgb("#f4efe4"), aging: 0.3))
-  place(center + horizon, text(60pt, fill: luma(225))[DRAFT])
+  place(center + horizon, text(60pt, fill: luma(225))[Lorem ipsum])
 })
 ```
 

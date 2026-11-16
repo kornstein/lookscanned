@@ -2,6 +2,19 @@
 
 Each preset lists only the keys that differ from the [neutral values](themes.md). Source: `typst/presets.typ`.
 
+| Preset | Granularity | Look |
+|---|---|---|
+| `clean-scan` | `"line"` | Archived copy, barely noticeable |
+| `office-scan` | `"line"` | Departmental scan (default) |
+| `photocopy` | `"line"` | Copied many times: bleed, drum bands, dust |
+| `fax` | `"word"` | Transmission lines, per-word jitter |
+| `typewriter` | `"char"` | Per-character jitter, worn ribbon |
+| `old-paper` | `"line"` | Library book: yellowing, foxing, stains |
+| `phone-scan` | `"line"` | Photographed page: strong rotation, uneven light |
+| `mimeograph` | `"line"` | Stencil copy: heavy faded ink, punch holes, folds |
+| `microfilm` | `"line"` | Grey film, scratches, dark vignette |
+| `newsprint` | `"line"` | Cheap fibrous paper, one fold |
+
 ## `clean-scan`
 
 ```typst

@@ -152,7 +152,7 @@ lookscanned
 
 ## Credits
 
-Part of the Rust code and the documentation was built with [Claude](https://claude.ai); the rest was typed by hand.
+The documentation was written with [OpenCode](https://opencode.ai); the code was typed by hand.
 
 lookscanned builds on [wasm-minimal-protocol](https://github.com/astrale-sharp/wasm-minimal-protocol),
 [minicbor](https://crates.io/crates/minicbor) and [miniz_oxide](https://crates.io/crates/miniz_oxide).

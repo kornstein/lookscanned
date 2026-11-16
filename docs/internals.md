@@ -1,8 +1,10 @@
 # Internals
 
-## How it works
+## Overview
 
 lookscanned never rasterises the document. Typst lays it out as usual; the package adds images behind and in front of each page and changes how text and strokes are painted.
+
+Rust generates pixels; Typst places and transforms content. The output remains an ordinary Typst document.
 
 ### Components
 
@@ -26,8 +28,6 @@ src/                       Rust plugin, compiled to wasm32-unknown-unknown
 ├── jitter.rs              Random table
 └── texture/               One module per texture family
 ```
-
-Rust generates pixels; Typst places and transforms content. The output remains an ordinary Typst document.
 
 ### Plugin protocol
 
@@ -106,7 +106,7 @@ With `#set page(height: auto)`, only the paper colour and the tiled grain are dr
 
 ### `page` and `region`
 
-`page` cannot change ink or text jitter, and cannot be nested. `region` inside `scan` applies text effects twice.
+`page` overrides page effects only, rotation and block jitter included: it cannot change ink, and word or character jitter keep the `scan` settings. It cannot be nested. `region` inside `scan` applies text effects twice.
 
 ### Show rules on strokes
 
@@ -119,27 +119,6 @@ With `#set page(height: auto)`, only the paper colour and the tiled grain are dr
 ### Damage hides text
 
 `dog-ear` and `torn` cover the text under them. Keep wide margins.
-
-### PDF viewers
-
-Textured ink uses tiling patterns as text paint:
-
-| Viewer | Result |
-|---|---|
-| macOS Preview, Ghostscript, MuPDF | Correct |
-| Poppler (Evince, Okular, `pdftoppm`) | Outline drawn as plain ink: bold, smudged text |
-
-!!! danger "PNG export in Typst 0.15.1"
-
-    Typst 0.15.1 panics when exporting to PNG text filled with an image tiling (a Typst bug). Export a PDF and convert it:
-
-    ```sh
-    typst compile doc.typ doc.pdf
-    gs -dNOPAUSE -dBATCH -sDEVICE=png16m -r300 -dDownScaleFactor=2 -dMaxBitmap=2000000000 \
-      -sOutputFile=doc-%d.png doc.pdf
-    ```
-
-    `-dDownScaleFactor=2` avoids over-thick strokes at low resolution; `-dMaxBitmap` avoids blank bands.
 
 ### Details on screen
 
@@ -155,10 +134,10 @@ Ghost copies are tagged as PDF artifacts, but most extractors still return them.
 
 ### Compile time
 
-A few seconds per page is normal. See [Performance](guide/textures.md).
+A few seconds per page is normal. See [Performance](guide/textures.md#cost).
 
-### Accessibility and responsible use
+## Responsible use
 
-Text stays real: selectable, searchable, readable by screen readers (except with `ghosting`). The visual result is harder to read on purpose. When the content matters, also distribute a clean version: compile the same source with `intensity: 0`.
+Text stays real: selectable, searchable, readable by screen readers (except with `ghosting`). The visual result is harder to read on purpose, so when the content matters, also distribute a clean version: compile the same source with `intensity: 0` (the paper colour stays).
 
 lookscanned is meant for design, illustration, fiction, games, props and testing OCR or document pipelines. Do not use it to forge documents or pass a generated document off as a genuine scan.

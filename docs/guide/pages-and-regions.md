@@ -12,13 +12,14 @@
 ```typst
 #show: lookscanned.scan.with(preset: "office-scan")
 
-= Lecture notes
-…
+= Lorem ipsum
+
+#lorem(30)
 
 #pagebreak()
 #lookscanned.page(stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
-  = Appendix
-  …
+  = Dolor sit amet
+  #lorem(30)
 ]
 ```
 
@@ -32,28 +33,37 @@
 
 - Applies from the page where the body starts to the page where it ends.
 - Inserts no page break: add `#pagebreak()` yourself.
-- Same arguments as `scan`. Unset ones are inherited from `scan`; `preset` replaces the document's preset on those pages.
-- Overrides **page effects only**: paper, stains, dust, lighting, damage, scanner, page rotation. Ink and word or character jitter keep the `scan` settings.
+- Takes the same arguments as `scan`. Unset arguments are inherited from `scan`; `preset` replaces the document's preset on those pages.
+- Overrides **page effects only**: paper, stains, dust, lighting, damage, scanner, page rotation and block jitter. Ink and word or character jitter keep the `scan` settings.
 - Cannot be nested.
 
 ```typst
-// A clean title page.
-#lookscanned.page(stains: none, edges: none)[= Title]
+// A title page without stains or edge effects.
+#lookscanned.page(stains: none, edges: none)[= Lorem ipsum]
 ```
 
 ## `region`
 
 ```typst
-The proof below is reproduced from the 1958 edition.
+#lorem(12)
 
 #lookscanned.region(preset: "typewriter", seed: 2)[
-  *Proof.* Let $epsilon > 0$ and choose $N$ such that $abs(u_n - ell) <= epsilon$
-  for all $n >= N$. Then $abs(u_p - u_q) <= 2 epsilon$ for all $p, q >= N$.
+  = Lorem ipsum
+  #lorem(40)
 ]
+
+#lorem(12)
 ```
 
 ![A clean document with a typewritten block](../assets/img/region.png)
 
-Returns a full-width block that is filled with the paper colour and grain, inks and jitters its text, equations and strokes, and is rotated by an angle drawn from `skew.page-rotation`.
+`region` returns a full-width block filled with the paper colour and grain. Its text, equations and strokes are inked and jittered, and the block is rotated by an angle drawn from `skew.page-rotation`.
 
-It draws no stains, dust, lighting, damage or scanner effects. Use it in a document **without** `scan`; inside one, text effects would apply twice.
+- It draws no stains, dust, lighting, damage or scanner effects: page effects belong to `scan` and `page`.
+- Use it in a document **without** `scan`. Inside `scan`, text effects would apply twice.
+
+## Which one
+
+- Whole document: `scan`.
+- A few pages, or a title page: `scan` + `page`.
+- One excerpt in a clean document: `region`.

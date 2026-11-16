@@ -110,8 +110,6 @@ Every key, with its default and an image, is in the
 - There is no true blur or perspective: `phone-scan` relies on rotation and lighting.
 - `"word"` granularity prevents hyphenation in justified text; `"char"` only shifts characters vertically.
 - `scan` uses the page `background` and `foreground`, and page-sized textures need a fixed page height.
-- Poppler-based viewers draw the textured ink as plain ink. For PNG output, export a PDF and convert it with
-  Ghostscript.
 
 ---
 
@@ -119,7 +117,7 @@ Every key, with its default and an image, is in the
   <b><a href="https://kornstein.github.io/lookscanned/">Read the full documentation →</a></b>
 </p>
 
-Part of the Rust code and documentation was build using [Claude](https://claude.ai), the rest was typed by hand. A "scanned" document is harder to read, so keep a clean version around
+The documentation was written with [OpenCode](https://opencode.ai); the code was typed by hand. A "scanned" document is harder to read, so keep a clean version around
 (`intensity: 0`). lookscanned is meant for design, fiction, games, props and OCR testing, not for forging documents.
 
 ## License

@@ -13,11 +13,11 @@ nav = [
   { "Getting started" = "getting-started.md" },
   { "Guide" = [
     "guide/presets.md",
-    "guide/ink.md",
-    "guide/paper.md",
+    "guide/text.md",
+    "guide/page.md",
     "guide/pages-and-regions.md",
     "guide/decorations.md",
-    "guide/mathematics.md",
+    "guide/templates.md",
     "guide/textures.md",
   ] },
   { "Reference" = [

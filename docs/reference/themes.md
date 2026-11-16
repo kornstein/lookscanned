@@ -1,6 +1,6 @@
 # Themes
 
-Seven themes, each a dictionary passed to `scan`, `page`, `region` or `derive`. Omitted keys keep the preset's value. The *Neutral* column is the value with no effect.
+Seven themes, 33 settings. A theme is a dictionary passed to `scan`, `page`, `region` or `derive`; omitted keys keep the preset's value. The *Neutral* column is the value with no effect.
 
 `none` resets a whole theme or a single key to neutral:
 
@@ -12,7 +12,7 @@ Seven themes, each a dictionary passed to `scan`, `page`, `region` or `derive`. 
 )
 
 // No stains on the title page only.
-#lookscanned.page(stains: none)[= Title]
+#lookscanned.page(stains: none)[= Lorem ipsum]
 ```
 
 Numbers must be non-negative. Amounts are designed for 0 to 1; larger values exaggerate.
@@ -31,8 +31,8 @@ Numbers must be non-negative. Amounts are designed for 0 to 1; larger values exa
 | Key | Type | Neutral | Description |
 |---|---|---|---|
 | `color` | `color` | `rgb("#8b5a2b")` | Colour of the stains. |
-| `amount` | number | `0` | Density of stains (blotches, rings, splatters) per page. |
-| `size` | `dictionary` | `(min: 2mm, max: 15mm)` | Range of stain diameters. Both are positive lengths. |
+| `amount` | number | `0` | Density of stains (blotches, rings, splatters) per page, scaled to page area. |
+| `size` | dictionary | `(min: 2mm, max: 15mm)` | Range of stain diameters. Both are positive lengths. |
 | `dust` | number | `0` | Dark specks and hairs. |
 | `scratches` | number | `0` | Long faint lines, mostly vertical. |
 
@@ -51,9 +51,9 @@ Numbers must be non-negative. Amounts are designed for 0 to 1; larger values exa
 | Key | Type | Neutral | Description |
 |---|---|---|---|
 | `page-rotation` | `angle` | `0deg` | Maximum rotation of a page. Each page draws its angle from the seed. |
-| `line-jitter` | `angle` | `0deg` | Extra rotation of each block (granularity `"line"`) or each word (`"word"`). |
+| `line-jitter` | `angle` | `0deg` | Extra rotation of each block (`"line"`) or each word (`"word"`). |
 | `char-jitter` | `length` | `0pt` | Offset of each word (`"word"`) or vertical shift of each character (`"char"`). |
-| `drift` | number in [0, 1] | `0` | `0`: pages are independent. `1`: the angle wanders slowly from page to page. |
+| `drift` | number | `0` | `0`: pages are independent. `1`: the angle wanders slowly from page to page. |
 
 ## `edges`
 
@@ -85,14 +85,14 @@ Numbers must be non-negative. Amounts are designed for 0 to 1; larger values exa
 | `tile` | `bool` | `true` | Repeat one grain tile on every page instead of a full-page grain per page. |
 | `granularity` | `str` | `"line"` | What jitters: `"page"`, `"line"`, `"word"` or `"char"`. |
 
-Trade-offs: [Performance](../guide/textures.md#the-quality-theme).
+Trade-offs: [Performance](../guide/textures.md#cost).
 
 ## Intensity
 
 Applied after the preset and your overrides are merged:
 
 - every number, length and angle is multiplied by `intensity`;
-- `legibility` becomes `1 - (1 - legibility) × intensity`, so it degrades proportionally and never goes below 0;
-- these keys are never scaled: `color`, `size`, `drift`, `resolution`, `tile`, `granularity`, `binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`, `ghosting`.
+- `legibility` becomes `1 − (1 − legibility) × intensity`, so it degrades proportionally and never goes below 0;
+- these keys are never scaled: `color`, `ghosting`, `size`, `drift`, `resolution`, `tile`, `granularity`, `binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`.
 
-With `intensity: 0` every amount, angle and offset is zero, and the on/off switches (`binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`, `ghosting`) are turned off. Only the paper colour stays.
+With `intensity: 0`, every amount, angle and offset is zero and the on/off switches (`ghosting`, `binding`, `punch-holes`, `folds`, `dog-ear`, `staple`, `paperclip`, `torn`) are turned off. Only the paper colour stays.

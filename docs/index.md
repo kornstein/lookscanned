@@ -7,8 +7,8 @@ title: lookscanned
 **Make a Typst document look scanned, photocopied, faxed or typewritten.**
 
 <figure markdown>
-![Lecture notes rendered with the old-paper preset](assets/img/hero.png)
-<figcaption>The <code>old-paper</code> preset.</figcaption>
+![Lorem ipsum excerpt with the old-paper preset](assets/img/hero.png)
+<figcaption><code>old-paper</code>, <code>seed: 3</code>.</figcaption>
 </figure>
 
 ```typst
@@ -17,25 +17,22 @@ title: lookscanned
 #show: lookscanned.scan.with(preset: "old-paper", seed: 3)
 ```
 
-lookscanned adds paper, stains, dust, lighting, page rotation and textured ink. Three guarantees:
+The package adds paper, stains, dust, lighting, damage, page rotation and textured ink around the document; the content itself is never rasterised.
 
-- **Text stays text.** Nothing is rasterised: text and equations remain selectable, searchable and accessible.
-- **Layout is unchanged.** Line and page breaks match the clean document (tested for every preset).
-- **Rendering is deterministic.** Same source and `seed`, same PDF.
-
-Requires Typst 0.14 or later. The Rust plugin ships inside the package; nothing else to install.
-
-## Where to go
-
-| I want to… | Page |
+| Guarantee | What it means |
 |---|---|
-| Get a first result | [Getting started](getting-started.md) |
-| Pick or build a look | [Presets](guide/presets.md) |
-| Tune the text | [Ink](guide/ink.md) |
-| Tune the sheet: paper, stains, lighting, damage | [Paper and page effects](guide/paper.md) |
-| Change a few pages, or one block | [Pages and regions](guide/pages-and-regions.md) |
-| Add stamps, notes, highlights, stains | [Decorations](guide/decorations.md) |
-| Use it with equations or a template | [Mathematics and templates](guide/mathematics.md) |
-| Speed up compilation, or use raw images | [Performance and textures](guide/textures.md) |
-| Look up an argument | [API](reference/api.md), [Themes](reference/themes.md) |
-| Know the limits | [Internals › Limitations](internals.md#limitations) |
+| **Text stays text** | Nothing is turned into an image. Text and equations remain selectable, searchable and readable by screen readers. |
+| **Layout is unchanged** | Line and page breaks match the clean document, with the `"page"` and `"line"` granularities. |
+| **Output is deterministic** | The same source and `seed` give the same PDF, byte for byte. |
+
+Typst 0.14 or later. The Rust plugin ships inside the package; nothing else to install.
+
+## Documentation
+
+| Section | Contents |
+|---|---|
+| [Getting started](getting-started.md) | Installation, first document, presets and themes |
+| [Guide](guide/presets.md) | Presets, text and ink, page effects, pages and regions, decorations, templates, performance |
+| [Reference](reference/api.md) | Public API, themes, presets, texture kinds |
+| [Internals](internals.md) | Architecture, rendering pipeline, determinism, limitations |
+| [Development](development.md) | Toolchain, tasks, tests, release process |

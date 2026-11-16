@@ -1,6 +1,6 @@
 # Presets
 
-A preset is a complete look: a dictionary of [themes](../reference/themes.md). `scan`, `page` and `region` take a preset name or dictionary. The default is `"office-scan"`.
+A preset is a complete look: a dictionary of [themes](../reference/themes.md). `scan`, `page` and `region` accept a preset name or a dictionary. The default is `"office-scan"`.
 
 ```typst
 #show: lookscanned.scan.with(preset: "photocopy")
@@ -8,7 +8,7 @@ A preset is a complete look: a dictionary of [themes](../reference/themes.md). `
 
 ## Gallery
 
-Same excerpt, `seed: 3`. Exact values: [Presets reference](../reference/presets.md).
+Same Lorem ipsum excerpt, `seed: 3`. Exact values: [Presets reference](../reference/presets.md).
 
 <div class="grid" markdown>
 
@@ -68,7 +68,7 @@ Same excerpt, `seed: 3`. Exact values: [Presets reference](../reference/presets.
 
     `typewriter` does not change the font. Pair it with a monospaced face, e.g. `#set text(font: "Courier Prime")`.
 
-## Intensity and seed
+## Strength and variation
 
 ```typst
 #show: lookscanned.scan.with(preset: "fax", intensity: 0.5)       // half as strong
@@ -76,10 +76,11 @@ Same excerpt, `seed: 3`. Exact values: [Presets reference](../reference/presets.
 #show: lookscanned.scan.with(preset: "fax", seed: 12)             // another variant
 ```
 
-- `intensity` multiplies amounts, angles and lengths. Colours, sizes, switches and `quality` are not scaled. `0` turns every effect off, switches included. Exact rule: [Themes › Intensity](../reference/themes.md#intensity).
-- `seed` (integer, default `0`) drives every random choice. Same seed, same PDF.
+`intensity` multiplies numbers, lengths and angles. Colours, sizes, on/off switches and `quality` are never scaled; `intensity: 0` also turns the switches off. Exact rule: [Themes › Intensity](../reference/themes.md#intensity).
 
-## Changing a preset
+`seed` is an integer, default `0`. It fixes every random choice, so the same seed always gives the same PDF.
+
+## Override a preset
 
 Pass theme dictionaries next to `preset`. Within a theme, omitted keys keep the preset's value:
 
@@ -87,19 +88,19 @@ Pass theme dictionaries next to `preset`. Within a theme, omitted keys keep the 
 #show: lookscanned.scan.with(preset: "fax", ink: (bleed: 0.2))
 ```
 
-`none` resets to the neutral value (no effect), for a whole theme or a single key:
+`none` resets a whole theme or a single key to its neutral value:
 
 ```typst
 #show: lookscanned.scan.with(
   preset: "old-paper",
   stains: none,        // no stains, dust or scratches
-  ink: (bleed: none),  // no bleed; the rest of the ink stays
+  ink: (bleed: none),  // no bleed; the rest of the preset's ink stays
 )
 ```
 
-## Your own presets
+## `derive`: a preset to reuse
 
-`derive` stores a modified preset for reuse. It takes the same overrides as `scan`, merged key by key:
+`derive` returns a new preset instead of applying it. It takes the same overrides as `scan`, merged key by key:
 
 ```typst
 #let soft-fax = lookscanned.derive("fax", ink: (bleed: 0.2))
@@ -110,7 +111,9 @@ Pass theme dictionaries next to `preset`. Within a theme, omitted keys keep the 
 
     `lookscanned.presets.fax + (ink: (bleed: 0.2))` replaces the whole `ink` theme and drops `fade`, `wear` and `legibility`.
 
-A plain dictionary also works as a preset. It starts from the **neutral** values, not from another preset:
+## A preset from scratch
+
+A plain dictionary is also a preset. It starts from the **neutral** values, not from another preset:
 
 ```typst
 #let my-scan = (
@@ -135,4 +138,4 @@ To share presets across files, define them in a module and import it:
 #show: lookscanned.scan.with(preset: library-copy)
 ```
 
-Preset dictionaries are validated like any argument: unknown themes or keys, wrong types and out-of-range values stop compilation with an explicit error.
+Preset dictionaries are validated like any other argument: unknown themes or keys, wrong types and out-of-range values stop compilation with an explicit error.

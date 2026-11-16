@@ -8,15 +8,11 @@
 #let fig = sys.inputs.at("fig", default: "hero")
 
 #let excerpt = [
-  = Cauchy sequences
+  = Lorem ipsum
 
-  A sequence $(u_n)$ of real numbers is a _Cauchy sequence_ if for every
-  $epsilon > 0$ there exists $N in NN$ such that $abs(u_p - u_q) <= epsilon$
-  for all $p, q >= N$.
+  #lorem(30)
 
-  *Theorem 1.4.* A real sequence converges if and only if it is a Cauchy
-  sequence. In particular, for $abs(q) < 1$,
-  $ sum_(n=0)^infinity q^n = 1 / (1 - q). $
+  $ integral_0^1 x^2 dif x = 1/3 $
 ]
 
 // Same layout everywhere, so figures can be compared side by side.
@@ -25,7 +21,7 @@
 // Neutral settings for ink close-ups: no rotation, no page effects.
 #let still = (skew: (page-rotation: 0deg, line-jitter: 0deg, char-jitter: 0pt))
 
-#let sample = [*Theorem.* Every bounded monotone sequence converges: $u_n -> sup_k u_k$.]
+#let sample = [#lorem(12)]
 
 #let ink-row(label, ..overrides) = (
   text(size: 8pt, fill: luma(90), raw(label)),
@@ -47,7 +43,7 @@
   set page(..page-setup)
   show: lookscanned.scan.with(preset: name, seed: 3)
   excerpt
-  if fig == "hero" { lookscanned.scribble(body: "complete!", color: rgb("#2a3f8f"), at: (x: 70%, y: 78%)) }
+  if fig == "hero" { lookscanned.scribble(body: "lorem ipsum", color: rgb("#2a3f8f"), at: (x: 70%, y: 78%)) }
 } else if fig.starts-with("start-") {
   set page(..page-setup)
   let step = int(fig.slice(6))
@@ -65,7 +61,7 @@
     )
   }
   excerpt
-  if step == 4 { lookscanned.stamp("Library copy", color: rgb("#5b3a8c"), at: (x: 62%, y: 76%), size: 10pt) }
+  if step == 4 { lookscanned.stamp("Lorem ipsum", color: rgb("#5b3a8c"), at: (x: 62%, y: 76%), size: 10pt) }
 } else if fig == "ink-bleed" {
   ink-figure(((0, 0.4, 0.8, 1.2).map(b => ink-row("bleed: " + str(b), ink: (bleed: b)))))
 } else if fig == "ink-fade" {
@@ -99,26 +95,26 @@
 } else if fig == "page-override" {
   set page(..page-setup)
   show: lookscanned.scan.with(preset: "office-scan", seed: 3)
-  [= Lecture notes
+  [= Lorem ipsum
   #lorem(30)]
   pagebreak()
   lookscanned.page(stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
-    = Appendix: tables
+    = Dolor sit amet
     #lorem(30)
   ]
 } else if fig == "region" {
   set page(width: 12cm, height: auto, margin: 0.8cm)
-  [The proof below is reproduced from the original 1958 edition. #lorem(14)]
+  [Lorem ipsum dolor sit amet, consectetur adipiscing elit. #lorem(14)]
   lookscanned.region(preset: "typewriter", seed: 2)[
-    *Proof.* Let $epsilon > 0$ and choose $N$ such that $abs(u_n - ell) <= epsilon$
-    for all $n >= N$. Then $abs(u_p - u_q) <= 2 epsilon$ for all $p, q >= N$.
+    = Lorem ipsum
+    #lorem(30)
   ]
-  [The converse requires the completeness of $RR$. #lorem(10)]
+  [Sed do eiusmod tempor incididunt ut labore. #lorem(10)]
 } else if fig == "decorations" {
   set page(width: 12cm, height: 6.5cm, margin: 0.8cm, fill: rgb("#f7f5ef"))
-  lookscanned.stamp("Library copy", color: rgb("#5b3a8c"), size: 13pt, at: (x: 0cm, y: 0.5cm))
-  lookscanned.stamp("Marked", angle: 9deg, size: 13pt, seed: 3, at: (x: 6.9cm, y: 1.9cm))
-  lookscanned.scribble(body: "see Thm 1.4", at: (x: 0.2cm, y: 3.4cm))
+  lookscanned.stamp("Lorem ipsum", color: rgb("#5b3a8c"), size: 13pt, at: (x: 0cm, y: 0.5cm))
+  lookscanned.stamp("Dolor sit", angle: 9deg, size: 13pt, seed: 3, at: (x: 6.9cm, y: 1.9cm))
+  lookscanned.scribble(body: "lorem ipsum", at: (x: 0.2cm, y: 3.4cm))
   lookscanned.scribble(width: 3.2cm, seed: 4, at: (x: 3.4cm, y: 3.6cm))
   lookscanned.stain(at: (x: 9.6cm, y: 0.6cm), size: 18mm)
 } else if fig == "damage" {
@@ -128,8 +124,8 @@
 } else if fig == "highlighter" {
   set page(width: 12cm, height: auto, margin: 0.8cm)
   show: lookscanned.scan.with(preset: "clean-scan", seed: 2)
-  [A sequence is a #lookscanned.highlighter[_Cauchy sequence_ if for every $epsilon > 0$ there exists $N$ such that $abs(u_p - u_q) <= epsilon$] for all $p, q >= N$.
-  #lookscanned.highlighter(color: rgb("#7be07b"), seed: 5)[Every Cauchy sequence converges.] #lorem(12)]
+  [#lorem(6) #lookscanned.highlighter[#lorem(10)] #lorem(6)
+  #lookscanned.highlighter(color: rgb("#7be07b"), seed: 5)[#lorem(4)] #lorem(12)]
   lookscanned.stain(at: (x: 85%, y: 30%), size: 16mm, over: true)
 } else if fig == "strokes" {
   set page(width: 12cm, height: auto, margin: 0.8cm)
@@ -137,14 +133,14 @@
   table(
     columns: 3,
     stroke: (x: none, y: 0.5pt),
-    table.header[Test][Condition][Conclusion],
+    table.header[Lorem][Ipsum][Dolor],
     table.hline(stroke: 1pt),
-    [Ratio], [$ell < 1$], [converges],
-    [Root], [$limsup root(n, abs(u_n)) < 1$], [converges],
-    [Cauchy], [Cauchy sequence], [converges],
+    [Sit], [amet], [consectetur],
+    [Adipiscing], [elit], [sed do],
+    [Eiusmod], [tempor], [incididunt],
   )
   line(length: 100%, stroke: 1.2pt)
-  rect(width: 100%, inset: 6pt)[*Remark.* Each test is inconclusive when the limit equals 1.]
+  rect(width: 100%, inset: 6pt)[*Lorem.* #lorem(10)]
 } else {
   panic("unknown figure " + repr(fig))
 }

@@ -50,8 +50,8 @@
 /// ```
 ///
 /// - preset: name or dictionary of themes. Default "office-scan". Names are
-///   "clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper"
-///   and "phone-scan".
+///   "clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper",
+///   "phone-scan", "mimeograph", "microfilm" and "newsprint".
 /// - intensity: 0 for no effect, 1 for the preset as is, more to exaggerate.
 ///   Default 1.
 /// - seed: integer. Same seed, same rendering. Default 0.

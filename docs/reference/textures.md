@@ -36,7 +36,7 @@ Fine light and dark speckles with small clumps, and optional fibres.
 
 ## `toner`
 
-Holes in a solid colour, with horizontal streaks. Laid over ink, it makes it look patchy (the stamps use it).
+Holes in a solid colour, with horizontal streaks. Laid over ink, it makes it look patchy; the stamps use it.
 
 | Parameter | Default | Description |
 |---|---|---|
@@ -106,7 +106,7 @@ Paper damage, drawn above the text.
 
 ## `marker`
 
-A single highlighter stroke across the image, with chisel ends, used by `highlighter`. The band fills 80% of the height, leaving room for its wobble.
+A single highlighter stroke across the image, with chisel ends, used by `highlighter`. The band fills 80 % of the height, leaving room for its wobble.
 
 | Parameter | Default | Description |
 |---|---|---|

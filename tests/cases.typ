@@ -96,7 +96,7 @@
     )
   ],
 
-  // docs/reference/api.md, guide/custom-presets.md, reference/themes.md
+  // docs/reference/api.md, docs/guide/presets.md, docs/reference/themes.md
   docs-presets: () => [
     #assert.eq(lookscanned.presets.keys(), ("clean-scan", "office-scan", "photocopy", "fax", "typewriter", "old-paper", "phone-scan", "mimeograph", "microfilm", "newsprint"))
     #let p = lookscanned.presets
@@ -130,13 +130,14 @@
       quality: (resolution: 100, tile: true, granularity: "line"),
     )
 
-    = Cauchy sequences
-    A sequence $(u_n)$ is a _Cauchy sequence_ if for every $epsilon > 0$ there
-    exists $N$ such that $abs(u_p - u_q) <= epsilon$ for all $p, q >= N$.
+    = Lorem ipsum
+    #lorem(20)
+
+    $ integral_0^1 x^2 dif x = 1/3 $
 
     #pagebreak()
     #lookscanned.page(preset: my-scan, stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
-      = Appendix: tables
+      = Dolor sit amet
       #lorem(20)
     ]
 
@@ -144,18 +145,108 @@
     #lookscanned.page(preset: library-copy)[#lorem(10)]
   ],
 
+  // docs/getting-started.md
+  docs-start: () => [
+    #set page(width: 12cm, height: 7cm, margin: (x: 1cm, y: 0.9cm))
+    #set text(font: "New Computer Modern", size: 10pt)
+    #set par(justify: true)
+    #show: lookscanned.scan.with(
+      preset: "office-scan",
+      seed: 7,
+      intensity: 1.6,
+      paper: (color: rgb("#f3ead6"), aging: 0.4),
+      ink: (bleed: 0.6),
+    )
+
+    = Lorem ipsum
+
+    #lorem(30)
+
+    $ integral_0^1 x^2 dif x = 1/3 $
+
+    #lookscanned.stamp("Lorem ipsum", color: rgb("#5b3a8c"), at: (x: 62%, y: 76%), size: 10pt)
+  ],
+
+  // docs/guide/text.md
+  docs-text: () => [
+    #set page(width: 12cm, height: 9cm)
+    #show: lookscanned.scan.with(
+      preset: "fax",
+      ink: (bleed: 0.6, fade: 0.3, wear: 0.2, legibility: 0.9, ghosting: true),
+      skew: (page-rotation: 0.9deg, line-jitter: 0.3deg),
+      quality: (granularity: "word"),
+    )
+
+    = Lorem ipsum
+    #lorem(30)
+
+    $ integral_0^1 x^2 dif x = 1/3 $
+
+    #lorem(10)
+
+    #line(length: 100%, stroke: 0.6pt)
+    #rect[#lorem(6)]
+    #table(columns: 2, stroke: (x: none, y: 0.5pt), table.header[Lorem][Ipsum], table.hline(stroke: 1pt), [Dolor], [Sit])
+  ],
+
+  // docs/guide/page.md
+  docs-page: () => [
+    #set page(width: 12cm, height: 9cm)
+    #show: lookscanned.scan.with(
+      preset: "old-paper",
+      paper: (color: rgb("#f4efe4"), grain: 0.5, aging: 0.4, fibers: 0.4),
+      stains: (color: rgb("#8b5a2b"), amount: 0.4, size: (min: 5mm, max: 25mm), dust: 0.6, scratches: 0.3),
+      edges: (shadow: 0.6, vignette: 0.4, uneven: 0.3, binding: true, punch-holes: true,
+        folds: 1, dog-ear: true, staple: true, paperclip: true, torn: true),
+      scanner: (lines: 0.5, bands: 0.4),
+    )
+
+    = Lorem ipsum
+    #lorem(60)
+  ],
+
+  // docs/guide/pages-and-regions.md
+  docs-pages: () => [
+    #set page(width: 12cm, height: 9cm)
+    #lookscanned.region(preset: "typewriter", seed: 2)[
+      = Lorem ipsum
+      #lorem(20)
+    ]
+    #show: lookscanned.scan.with(preset: "office-scan")
+
+    = Lorem ipsum
+    #lorem(20)
+
+    #pagebreak()
+    #lookscanned.page(stains: (amount: 1), skew: (page-rotation: 2deg), edges: (binding: true))[
+      = Dolor sit amet
+      #lorem(20)
+    ]
+  ],
+
+  // docs/guide/templates.md
+  docs-templates: () => [
+    #set page(width: 10cm, height: 8cm)
+    #show: lookscanned.scan.with(preset: "old-paper", seed: 12, edges: (binding: true))
+    #show heading: it => block(stroke: 0.4pt, inset: 4pt, it)
+
+    = Lorem ipsum
+
+    #block[#lorem(30)]
+  ],
+
   // docs/guide/decorations.md
   docs-decorations: () => [
     #set page(width: 12cm, height: 9cm)
     #show: lookscanned.scan.with(preset: "office-scan", seed: 7)
-    #lookscanned.stamp("Library copy", color: rgb("#5b3a8c"))
-    #lookscanned.stamp("Marked", angle: 9deg, at: (x: 70%, y: 80%))
-    #lookscanned.scribble(body: "see Thm 1.4", color: blue)
+    #lookscanned.stamp("Lorem ipsum", color: rgb("#5b3a8c"))
+    #lookscanned.stamp("Dolor sit amet", angle: 9deg, at: (x: 70%, y: 80%))
+    #lookscanned.scribble(body: "lorem ipsum", color: blue)
     #lookscanned.scribble(width: 3.2cm, seed: 4)
     #lookscanned.stain(at: (x: 60%, y: 20%), color: rgb("#6b4423"), size: 25mm)
     #lookscanned.stain()
     #lookscanned.stain(at: (x: 30%, y: 50%), over: true)
-    Some #lookscanned.highlighter[highlighted words] and #lookscanned.highlighter(color: rgb("#7be07b"), seed: 5)[a green one].
+    #lorem(8) #lookscanned.highlighter[#lorem(4)] #lorem(8) #lookscanned.highlighter(color: rgb("#7be07b"), seed: 5)[#lorem(6)]
   ],
 
   // docs/guide/textures.md
@@ -167,7 +258,7 @@
 
     #set page(background: {
       place(lookscanned.texture("paper", seed: 1, color: rgb("#f4efe4"), aging: 0.3))
-      place(center + horizon, text(60pt, fill: luma(225))[DRAFT])
+      place(center + horizon, text(60pt, fill: luma(225))[Lorem ipsum])
     })
     #lorem(10)
   ],

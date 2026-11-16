@@ -4,15 +4,15 @@
 #import "@preview/lookscanned:0.2.0"
 ```
 
-| Name | Purpose |
-|---|---|
-| [`scan`](#scan) | Show rule: the effect on the whole document |
-| [`page`](#page) | Override page effects on some pages |
-| [`region`](#region) | Text effects on one block |
-| [`derive`](#derive) | A preset with some settings changed |
-| [`presets`](#presets) | Built-in presets (dictionary) |
-| [`stamp`](#stamp), [`scribble`](#scribble), [`stain`](#stain), [`highlighter`](#highlighter) | Decorations |
-| [`texture`](#texture) | A raw texture image |
+| Name | Returns | Purpose |
+|---|---|---|
+| [`scan`](#scan) | content | Show rule: the effect on the whole document |
+| [`page`](#page) | content | Page effects on some pages |
+| [`region`](#region) | content | Text effects on one block |
+| [`derive`](#derive) | dictionary | A preset with some settings changed |
+| [`presets`](#presets) | dictionary | The built-in presets |
+| [`stamp`](#stamp), [`scribble`](#scribble), [`stain`](#stain), [`highlighter`](#highlighter) | content | Decorations |
+| [`texture`](#texture) | image | A raw texture |
 
 Names starting with `_` are internal.
 
@@ -38,8 +38,8 @@ With `page`, unset arguments come from `scan`. Positional arguments other than t
 Applies to everything after it:
 
 - sets the page `background` and `foreground`, replacing earlier ones;
-- rotates paragraphs, headings, lists, enumerations, term lists, figures, block equations and code blocks so each page looks rotated;
-- inks every text run, equation, and the strokes of `line`, `rect` and `table`; jitters words or characters.
+- rotates paragraphs, headings, lists, enumerations, term lists, figures, block equations and code blocks, so each page looks rotated;
+- inks every text run and equation, and the strokes of `line`, `rect` and `table`; jitters words or characters.
 
 Place it after `set page`, and before a template rule that must come last.
 
@@ -49,7 +49,7 @@ Place it after `set page`, and before a template rule that must come last.
 #lookscanned.page(..arguments)[body]
 ```
 
-Overrides page effects (paper, stains, lighting, damage, scanner, page rotation) on every page `body` spans. Ink and text jitter keep the `scan` settings. No page break, no nesting. Requires `scan`.
+Overrides page effects (paper, stains, lighting, damage, scanner, page rotation, block jitter) on every page `body` spans. Ink and word or character jitter keep the `scan` settings. No page break, no nesting. Requires `scan`.
 
 ## `region`
 
@@ -70,7 +70,7 @@ A full-width block filled with the paper colour and grain, slightly rotated, who
 | `preset` | `str` or `dictionary` | Base preset. |
 | `..themes` | `dictionary` or `none` | Overrides, as in `scan`. Omitted keys keep the preset's value; `none` resets to neutral. |
 
-Returns a preset dictionary.
+Returns a preset dictionary; the result stays differential, so it can be passed to `scan`, `page` or `derive` again.
 
 ```typst
 #let soft-fax = lookscanned.derive("fax", ink: (bleed: 0.2))
@@ -115,7 +115,7 @@ Dictionary of the built-in presets. Each lists only the keys that differ from ne
 | `width` | `length` | `4cm` | Scrawl width (ignored with `body`). |
 | `seed` | `int` | `0` | Shape variant. |
 | `angle` | `angle` | `-3deg` | Rotation. |
-| `at` | `(x, y)` or `none` | `none` | Top-left corner. |
+| `at` | `(x, y)` or `none` | `none` | Top-left corner. `none`: inline. |
 
 ## `stain`
 
@@ -154,8 +154,17 @@ Dictionary of the built-in presets. Each lists only the keys that differ from ne
 |---|---|---|---|
 | `kind` | `str` | required | A [texture kind](textures.md). |
 | `seed` | `int` | `0` | Variant. |
-| `width`, `height` | `length` or `auto` | `auto` | Image size. `auto`: page size (needs a fixed page height). |
+| `width`, `height` | `length` or `auto` | `auto` | Image size. `auto`: page size, which needs a fixed page height. |
 | `resolution` | number | `150` | DPI. Some kinds use a fraction of it. |
-| `..parameters` | named | | Kind-specific. Lengths are converted to pixels. |
+| `..parameters` | named | | Kind-specific. Lengths are converted to pixels; colours to RGB. |
 
 Returns an `image`.
+
+## Errors
+
+Every error is an `assert`. Its message starts with `lookscanned.scan: `, `lookscanned.page: `, `lookscanned.region: ` or `lookscanned: `, then gives the problem, the value received and the expected values. Example:
+
+```text
+lookscanned.scan: ink.bled is unknown, expected one of bleed, fade,
+legibility, wear, ghosting
+```
